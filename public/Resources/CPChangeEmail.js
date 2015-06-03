@@ -53,8 +53,8 @@ CP.ChangeEmail = CP.extend(CP.emptyFn, {
 			pageObj.changeAltEmail();
 		});
 	},
-
-	changeEmail: function () {
+	
+	validateEmailChange: function(a,b){
 		var aRequired = $('#emailChange *[required]');
 		var bValid = CP.checkRequiredFields(aRequired);
 		if (!bValid){
@@ -62,12 +62,22 @@ CP.ChangeEmail = CP.extend(CP.emptyFn, {
 			return false;
 		}
 		
+		var bConfirmed = CP.checkConfirmFields(a, b);
+		if (!bConfirmed){
+			CP.setValidationBox('updateemail', false, CP.Message.emailAddressesDoNotMatch);
+			return false;
+		}
+		
+		return true;
+	},
+	
+	changeEmail: function () {
+		var pageObj = this;
+		
 		var sNewEmail = $('input[name="_emailaddress"]').val();
 		var sNewEmailConfirm = $('input[name="confirmemailaddress"]').val();
 		
-		var bConfirmed = CP.checkConfirmFields(sNewEmail, sNewEmailConfirm);
-		if (!bConfirmed){
-			CP.setValidationBox('updateemail', false, CP.Message.emailAddressesDoNotMatch);
+		if (!pageObj.validateEmailChange(sNewEmail, sNewEmailConfirm)){
 			return false;
 		}
 		
@@ -92,8 +102,8 @@ CP.ChangeEmail = CP.extend(CP.emptyFn, {
 			}
 		});
 	},
-
-	changeAltEmail: function () {
+	
+	validateAltEmailChange: function(a,b){
 		var aRequired = $('#altEmailChange *[required]');
 		var bValid = CP.checkRequiredFields(aRequired);
 		if (!bValid){
@@ -101,12 +111,20 @@ CP.ChangeEmail = CP.extend(CP.emptyFn, {
 			return false;
 		}
 		
+		var bConfirmed = CP.checkConfirmFields(a, b);
+		if (!bConfirmed){
+			CP.setValidationBox('updatealtemail', false, CP.Message.emailAddressesDoNotMatch);
+			return false;
+		}
+	},
+
+	changeAltEmail: function () {
+		var pageObj = this;
+		
 		var sNewAltEmail = $('input[name="_altemailaddress"]').val();
 		var sNewAltEmailConfirm = $('input[name="confirmaltemailaddress"]').val();
 		
-		var bConfirmed = CP.checkConfirmFields(sNewAltEmail, sNewAltEmailConfirm);
-		if (!bConfirmed){
-			CP.setValidationBox('updatealtemail', false, CP.Message.emailAddressesDoNotMatch);
+		if (!pageObj.validateAltEmailChange(sNewAltEmail, sNewAltEmailConfirm)){
 			return false;
 		}
 		
@@ -127,6 +145,7 @@ CP.ChangeEmail = CP.extend(CP.emptyFn, {
 			else {
 				var sError = CP.Message.getError(obj);
 				CP.setValidationBox('updatealtemail', false, sError);
+				return false;
 			}
 		});
 	}

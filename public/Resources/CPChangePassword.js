@@ -24,12 +24,8 @@ CP.ChangePassword = CP.extend(CP.emptyFn, {
 		});
 
 	},
-
-	changePassword: function () {
-		var sPassword = $('input[name="_password"]').val(),
-			sNewPassword = $('input[name="password"]').val(),
-			sConfirmPassword = $('input[name="confirmpassword"]').val();
-
+	
+	validatePassword: function(a,b){
 		var aRequired = $("#change-password *[required]");
 		var bValid = CP.checkRequiredFields(aRequired);
 		if (!bValid) {
@@ -37,9 +33,23 @@ CP.ChangePassword = CP.extend(CP.emptyFn, {
 			return false;
 		}
 
-		var bConfirmed = CP.checkConfirmFields(sNewPassword, sConfirmPassword);
+		var bConfirmed = CP.checkConfirmFields(a, b);
 		if (!bConfirmed) {
 			CP.setValidationBox('updatepassword', false, 'New password\'s do not match.');
+			return false;
+		}
+		
+		return true;
+	},
+	
+	changePassword: function () {
+		var pageObj = this;
+		
+		var sPassword = $('input[name="_password"]').val(),
+			sNewPassword = $('input[name="password"]').val(),
+			sConfirmPassword = $('input[name="confirmpassword"]').val();
+			
+		if (!pageObj.validatePassword(sNewPassword, sConfirmPassword)){
 			return false;
 		}
 

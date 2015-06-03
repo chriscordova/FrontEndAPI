@@ -46,8 +46,8 @@ CP.Verify = CP.extend(CP.emptyFn, {
 		});
 
 	},
-
-	verify: function (a,b,c) {
+	
+	validateForm: function(a1,b1){
 		var aRequired = $('#verify-form *[required]');
 		var bValid = CP.checkRequiredFields(aRequired);
 		if (!bValid){
@@ -55,11 +55,22 @@ CP.Verify = CP.extend(CP.emptyFn, {
 			return false;
 		}
 		
-		var sPassword = $('#password').val();
-		var sPasswordConfirm = $('#confirm-password').val();
-		var bConfirmed = CP.checkConfirmFields(sPassword, sPasswordConfirm);
+		var bConfirmed = CP.checkConfirmFields(a1, b1);
 		if (!bConfirmed){
 			CP.setValidationBox('verify', false, 'Password fields do not match.');
+			return false;
+		}
+		
+		return true;
+	},
+	
+	verify: function (a,b,c) {
+		var pageObj = this;
+		
+		var sPassword = $('#password').val();
+		var sPasswordConfirm = $('#confirm-password').val();
+		
+		if (!pageObj.validateForm(sPassword, sPasswordConfirm)){
 			return false;
 		}
 		

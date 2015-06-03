@@ -20,12 +20,12 @@ CP.ContactUs = CP.extend(CP.emptyFn, {
 	initForm: function(){
 		var pageObj = this;
 		$('input#sendmessage').on('click', function(){
-			pageObj.validate();
+			pageObj.validateForm();
 		});
 		
 	},
 	
-	validate: function(){
+	validateForm: function(){
 		var pageObj = this;
 		var aRequired = $("#contact *[required]");
 		var bValid = CP.checkRequiredFields(aRequired);
@@ -34,10 +34,10 @@ CP.ContactUs = CP.extend(CP.emptyFn, {
 			return false;
 		}
 		
-		pageObj.submit();
+		pageObj.submitForm();
 	},
 	
-	submit: function(){
+	submitForm: function(){
 		var oData = $("#contact").serializeArray();
 		oData.push({ name: "action", value: "SendContactUsMessage" });
 		

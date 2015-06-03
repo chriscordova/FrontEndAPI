@@ -22,7 +22,7 @@ CP.ReferAFriend = CP.extend(CP.emptyFn, {
 		pageObj.setReferralLink();
 
 		$('#send-referral').on('click', function () {
-			pageObj.send();
+			pageObj.sendReferral();
 		});
 	},
 
@@ -39,13 +39,21 @@ CP.ReferAFriend = CP.extend(CP.emptyFn, {
 			}
 		});
 	},
-
-	send: function () {
-		
+	
+	validateForm: function(){
 		var aRequired = $('#referral *[required]');
 		var bValid = CP.checkRequiredFields(aRequired);
 		if (!bValid){
 			CP.setValidationBox('sendreferral', false, CP.Message.incompleteFields);
+			return false;
+		}
+		
+		return true;
+	},
+	
+	sendReferral: function () {
+		var pageObj = this;
+		if (!pageObj.validateForm()){
 			return false;
 		}
 		

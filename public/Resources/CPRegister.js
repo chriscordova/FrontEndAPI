@@ -112,7 +112,7 @@ CP.Register = CP.extend(CP.emptyFn, {
 			CP.setValidationBox('register-part1', false, CP.Message.agreeToTerms);
 			return false;
 		}
-		
+
 		return true;
 	},
 
@@ -157,8 +157,8 @@ CP.Register = CP.extend(CP.emptyFn, {
 	populateStates: function (country) {
 		var oState = $('#State');
 		oState.append($("<option></option>")
-						.attr("value", "")
-						.text("Choose one.."));
+			.attr("value", "")
+			.text("Choose one.."));
 		switch (country) {
 			case 'Australia':
 				$(CP.Data.auStates).each(function (i, v) {
@@ -179,7 +179,32 @@ CP.Register = CP.extend(CP.emptyFn, {
 		}
 	},
 
+	addToken: function (id) {
+		if (CP.isNotNullOrEmpty(id)) {
+			localStorage.setItem("REFID", id);
+		}
+	},
+
+	postRegistrationAction: function (obj) {
+		var sPostRegistration = obj.Data.PostRegistrationFormLink;
+		var sLink = obj.Data.ScreenerLink;
+		if (CP.isNotNullOrEmpty(sPostRegistration)) {
+			$('#postregoinfo').show();
+			setTimeout(function () {
+				document.location.href = sPostRegistration;
+			}, 5000);
+		}
+		else if (CP.isNotNullOrEmpty(sLink)) {
+			$('#screenerlink').html(sLink);
+			$('#screenerinfo').show();
+			setTimeout(function () {
+				document.location.href = sLink;
+			}, 5000);
+		}
+	},
+	
 	register: function () {
+		var pageObj = this;
 		$('#register-fail').hide();
 		$('#confirm').hide();
 		$('#loading').show();
@@ -204,26 +229,10 @@ CP.Register = CP.extend(CP.emptyFn, {
 				$('#registered').show();
 															
 				//Add localStorage of refid
-				if (CP.isNotNullOrEmpty(sRefId)) {
-					localStorage.setItem("REFID", sRefId);
-				}
-								
-				//Redirect to Screener if exists
-				var sPostRegistration = obj.Data.PostRegistrationFormLink;
-				var sLink = obj.Data.ScreenerLink;
-				if (CP.isNotNullOrEmpty(sPostRegistration)) {
-					$('#postregoinfo').show();
-					setTimeout(function () {
-						document.location.href = sPostRegistration;
-					}, 5000);
-				}
-				else if (CP.isNotNullOrEmpty(sLink)) {
-					$('#screenerlink').html(sLink);
-					$('#screenerinfo').show();
-					setTimeout(function () {
-						document.location.href = sLink;
-					}, 5000);
-				}
+				pageObj.addToken(sRefId);
+	
+				//Redirect to Screener if exists or go to post registration
+				pageObj.postRegistrationAction(obj);
 			}
 			else {
 				$('#loading').hide();
