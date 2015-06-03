@@ -1,0 +1,308 @@
+﻿<div class="row">
+<div id="dvWelcome" class="col-md-12">
+	<div class="well well-sm col-xs-6 col-md-12">
+		<h4>Welcome <span class="pFullName"></span>!</h4>
+		<span id="pEmail" style="  font-style: italic;font-size: 11px;"></span><br />
+		<a id="lnkLogout" style="cursor: pointer;">Logout</a>
+	</div>
+	
+	<div class="well well-sm col-xs-6 col-md-12">
+		<h3>Points Balance</h3>
+		Total: <span id="pPointsBalanceTotal"></span><br />
+		Today: <span id="pPointsBalanceToday"></span><br />
+		This Week:  <span id="pPointsBalanceWeek"></span><br />
+		This Month: <span id="pPointsBalanceMonth"></span><br />
+	</div>
+	
+	<div class="well well-sm col-xs-6 col-md-12">
+		<h3>Profile Completion</h3>
+		<span id="pProfileCompletion"></span>%
+	</div>
+	
+	<div class="well well-sm col-xs-6 col-md-12">
+		<h3>Polls</h3>
+		<div id="dvPoll"></div>
+		<input type="button" class="btn btn-default" style="display: none;" id="submit-poll" value="Submit Poll"/>
+		<input type="button" class="btn btn-default" style="display: none;" id="findnew" value="Find New Poll"/>
+	</div>
+</div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function () {
+	
+	//Maintenance Mode Check
+	function CheckIfMaintenanceUpcoming(){
+		var oDataTest2 = {
+			action: "GetMaintenanceModeLevel"
+		};
+		
+		$.post(CP.apiURL(), oDataTest2, function(response){
+			var obj = response;
+			var bSuccess = obj.Success;
+			if (bSuccess) {
+				var sTime = obj.Data.minutestomaintenance;
+				var iTime = parseInt(sTime, 10);
+				if (iTime > 0){
+					$('body').prepend('<div style="background-color: red; text-align: center; color:white; width: 100%; height: 20px;">NOTE: Panel will be in maintenance in '+ sTime + ' minutes!</div>');
+				}
+			}
+		});
+	}
+	
+	var oDataTest1 = {
+		action: "IsSiteAlive"
+	};
+	
+	$.post(CP.apiURL(), oDataTest1, function(response){
+		if (typeof response == 'string'){
+			if (response.indexOf('Theme/maintenance.png') >= 0){
+				var oHTML = response.toString();
+				var newImage = oHTML.replace('Theme/maintenance.png','../Theme/maintenance.png');
+				$('body').html(newImage);
+			}
+		}
+		else{	
+			$('body').removeClass('overlay');
+			CheckIfMaintenanceUpcoming();
+		}
+	});
+	
+	$('a#lnkLogout').on('click', function () {
+		localStorage.removeItem("TOKEN");
+		location.reload();
+	});
+	
+	var sReferralToken = localStorage.REFID;
+	
+	if (sReferralToken != undefined){
+		//Process referral if need to
+		var oData7 = {
+			action: "ProcessReferral",
+			token: CP.apiTOKEN(),
+			refid: sReferralToken
+		};
+		
+		$.post(CP.apiURL(), oData7, function (response) {
+			var obj = response;
+			if (obj.Success){
+				//remove refid from localstorage
+				localStorage.removeItem("REFID");
+			}
+		});
+		
+	}
+	
+	GetPoll();
+	
+	//Get Points Balance
+	var oData1 = {
+		action: "GetPointsBalance",
+		token: CP.apiTOKEN()
+	};
+	
+	$.post(CP.apiURL(), oData1, function (response) {
+		var obj = response;
+		$('#pPointsBalanceTotal').html(obj.Data.total);
+		$('#pPointsBalanceToday').html(obj.Data.today);
+		$('#pPointsBalanceWeek').html(obj.Data.week);
+		$('#pPointsBalanceMonth').html(obj.Data.month);
+	});
+	
+
+	//Get Profile Completion
+	var oData2 = {
+		action: "GetProfileFormCompletionStatus",
+		token: CP.apiTOKEN()
+	};
+	
+	$.post(CP.apiURL(), oData2, function (response) {
+		var obj = response;
+		$('#pProfileCompletion').html(obj.Data.percentcomplete);
+	});
+	
+	//!!!IMPORTANT!!!! You will need to manually add a setting if your panel wants to have Mobile Verification ON or OFF.
+	var VerifyMobile = CP.apiVerifyMobile();
+	
+	var oData3 = {
+		action: "GetPanelMemberDetails",
+		token: CP.apiTOKEN()
+	};
+	
+	$.post(CP.apiURL(), oData3, function (response) {
+		var obj = response;
+		if (obj.Success){
+			$('.pFullName').html(obj.Data.panelmemberdetails[0].fullname);
+			$('#pEmail').html(obj.Data.panelmemberdetails[0].emailaddress);
+			if (VerifyMobile){
+				var bHasUnverifiedMobile = obj.Data.panelmemberdetails[0].hasunverifiedmobile;
+				if (bHasUnverifiedMobile){
+					var oPath = $(location)[0].pathname;
+					var iVerifyPage = oPath.indexOf('smsverify');
+					if (iVerifyPage < 0){
+						document.location.href = "smsverify.html";
+					}
+				}
+			}
+		}
+	});
+	
+	//get Poll For Panel Member
+	function BuildPollQuestion(QuestionText, DataType, ListItems, AwardedCredits){
+		var sBuild = "";
+		var sControl = "";
+		sBuild += "<table class='table table-striped' id='"+ sAttributeId + "'><tr><th colspan='2'>" + QuestionText + "</th></tr>";
+		
+		switch (DataType)
+		{
+			case "Multiple Selection List":
+				sControl = "checkbox";
+				break;
+			case "Single Selection List":
+				sControl = "radio";
+				break;
+			default:
+				break;
+			
+		}
+		$.each(ListItems, function(i,v){
+			sBuild += "<tr>";
+			sBuild += "<td><label><input type='"+ sControl +"' name='listitem' value='" + v.value + "'/>  "+v.name+"</label></td>";
+			sBuild += "</tr>";
+		})
+		
+		sBuild += "<tr><td colspan='2'>This poll is worth "+ AwardedCredits + " credits</td></tr>";
+		$('#submit-poll').show();
+		
+		$('#dvPoll').html(sBuild);
+	}
+	
+	function BuildPoll(sId)
+	{	
+		var oData5 = {
+			action: "GetAttributeDetails",
+			token: CP.apiTOKEN(),
+			attributeid: sId,
+			postregistration: false
+		};
+		
+		$.post(CP.apiURL(), oData5, function (response) {
+			var obj = response;
+			if (obj.Success){
+				var sQuestionText = obj.Data.attribute[0].questiontext;
+				sDataType = obj.Data.attribute[0].datatype;
+				var aListItems = obj.Data.attribute[0].listitems;
+				BuildPollQuestion(sQuestionText, sDataType, aListItems, sAwardedCredits);
+			}
+			
+		});
+		
+	}
+	
+	var sAttributeId = "";
+	var sAwardedCredits = "";
+	var sPollId = "";
+	var sCount = 0;
+	var sDataType = "";
+	
+	function GetPoll(){
+		var oData4 = {
+			action: "GetPolls",
+			token: CP.apiTOKEN()
+		};
+		
+		$.post(CP.apiURL(), oData4, function (response) {
+			var obj = response;
+			if (obj.Success){
+				if (obj.Data.polls == false){
+					$('#submit-poll').hide();
+					$('#findnew').hide();
+					$('#dvPoll').html('You have completed all necessary polls');
+					
+				}
+				else{
+					sAttributeId = obj.Data.polls[0].pollattributeid;
+					sAwardedCredits = obj.Data.polls[0].awardedcredits;
+					sPollId = obj.Data.polls[0].pollid;
+					BuildPoll(sAttributeId);
+				}
+				
+			}
+			else{
+				var sError = CP.Message.getError(obj);
+				$('#dvPoll').html(sError);
+			}
+		});
+		
+	}
+	
+	//Save poll
+	function GetSelectedValues(AttributeId, DataType){
+		var Values = "";
+		var oTable = 'table#' + AttributeId;
+		switch (DataType)
+		{
+			case "Multiple Selection List":
+				var aSelected = [];
+				var aCheckboxes = $(oTable).find('input:checkbox');
+				$.each(aCheckboxes, function(i,v){
+					var bSelected = $(v).is(":checked");
+					if (bSelected){
+						sCount++;
+						var oValue = $(v).val();
+						aSelected.push(oValue);
+					}
+				});
+				
+				for (var i=0;i<aSelected.length;i++){
+					Values += aSelected[i];
+					var bFinish = (aSelected.length - i) == 1;
+					if (!bFinish){
+						Values += "|";
+					}
+				}
+
+				break;
+			case "Single Selection List":
+				Values = $(oTable + " input:radio[name='listitem']:checked").val();
+				sCount++;
+				break;
+			default:
+				break;
+		}
+		
+		return Values;
+	}
+	
+	$('#findnew').on('click',function(){
+		GetPoll();
+	});
+	
+	$('#submit-poll').on('click',function(){
+		var sValues =  GetSelectedValues(sAttributeId, sDataType);
+		
+		var oData6 = {
+			action: "SavePollResults",
+			token: CP.apiTOKEN(),
+			values: sValues,
+			count: sCount,
+			pollid: sPollId
+			
+		};
+		
+		$.post(CP.apiURL(), oData6, function (response) {
+			var obj = response;
+			if (obj.Success){
+				$('#submit-poll').hide();
+				$('#dvPoll').html('Thank you for your poll submission.');
+				
+				$('#findnew').show();
+			}
+			else{
+				var sError = CP.Message.getError(obj);
+				$('#dvPoll').html(sError);
+			}
+		});
+	});
+});
+</script>

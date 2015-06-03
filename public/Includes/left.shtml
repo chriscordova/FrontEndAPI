@@ -1,0 +1,94 @@
+﻿<div class="well"> 
+	<form class="form-signin">
+		<h3 class="form-signin-heading">Please sign in</h3>
+		<label for="inputEmail" class="sr-only">Email address</label>
+		<input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+		<br />
+		<label for="inputPassword" class="sr-only">Password</label>
+		<input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+		<div class="checkbox">
+		  <label>
+			<input type="checkbox" value="remember-me"> Remember me
+		  </label>
+		</div>
+		<button class="btn btn-lg btn-primary btn-block" id="btnLogin" type="submit">Sign in</button>
+	</form>
+	<div class="alert alert-danger" role="alert" id="login-fail" style="display: none;">
+	  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+	  <span class="sr-only">Error:</span>
+	  <span class="message"></span>
+	  
+	</div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+	//Maintenance Mode Check
+	function CheckIfMaintenanceUpcoming(){
+		var oDataTest2 = {
+			action: "GetMaintenanceModeLevel"
+		};
+		
+		$.post(CP.apiURL(), oDataTest2, function(response){
+			var obj = response;
+			var bSuccess = obj.Success;
+			if (bSuccess) {
+				var sTime = obj.Data.minutestomaintenance;
+				var iTime = parseInt(sTime, 10);
+				if (iTime > 0){
+					$('body').prepend('<div style="background-color: red; text-align: center; color:white; width: 100%; height: 20px;">NOTE: Panel will be in maintenance in '+ sTime + ' minutes!</div>');
+				}
+			}
+		});
+	}
+	
+	var oDataTest1 = {
+		action: "IsSiteAlive"
+	};
+	
+	$.post(CP.apiURL(), oDataTest1, function(response){
+		if (typeof response == 'string'){
+			if (response.indexOf('Theme/maintenance.png') >= 0){
+				var oHTML = response.toString();
+				var newImage = oHTML.replace('Theme/maintenance.png','../Theme/maintenance.png');
+				$('body').html(newImage);
+			}
+		}
+		else{
+			CheckIfMaintenanceUpcoming();
+		}
+	});
+
+	$('#btnLogin').on('click', function () {
+
+		var oData = {
+			action: "PanelLogin",
+			emailaddress: $('#inputEmail').val(),
+			password: $('#inputPassword').val()
+		};
+		
+		$.post(CP.apiURL(), oData, function (response) {
+			var obj = response;
+			var bSuccess = obj.Success;
+			if (bSuccess) {
+				localStorage.setItem("TOKEN", obj.Data.token);
+				document.location.href = '../member/index.html';
+			}
+			else {
+				//ONLY FOR CONTACT LOGIN
+				var sCustomError = obj.Data.IsContact;
+				if (sCustomError == false){
+					document.location.href = '/';
+					return false;
+				}
+				
+				var sError = CP.Message.getError(obj);					
+				CP.setValidationBox('login', false, sError);
+				return false;
+			}
+		});
+		
+		return false;
+	});
+
+});
+</script>

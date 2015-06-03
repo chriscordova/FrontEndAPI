@@ -1,0 +1,20 @@
+﻿.unstarted, .unstarted a {
+	color: #F00000;
+}
+
+.incomplete, .incomplete a {
+	color: #FF9900;
+}
+
+.complete, .complete a {
+	color: #66FF00;
+}
+
+.overlay {
+	  background: url("http://www.aveva.com/Images/ajax-loader.gif") no-repeat scroll center center;
+  z-index: 9999999;
+  overflow: hidden;
+  opacity: 0.2;
+  filter: alpha(opacity=80);
+    
+}

@@ -1,0 +1,43 @@
+﻿<div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="/member" class="navbar-brand">CP Demo</a>
+    </div>
+    <nav class="collapse navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li><a href="index.html">Home</a></li>
+		<li class="dropdown">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Redemptions <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="redeem.html">Redeem</a></li>
+			<li><a href="activategiftcard.html">Activate Gift Card</a></li>
+          </ul>
+	  </li>
+	  <li class="dropdown">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Account Details <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="changedetails.html">Change Details</a></li>
+			<li><a href="changepassword.html">Change Password</a></li>
+			<li><a href="changeemail.html">Change Email Address</a></li>
+			<li><a href="unsubscribe.html">Unsubscribe</a></li>
+          </ul>
+	  </li>
+	  <li><a href="referafriend.html">Refer a Friend</a></li>
+	  <li class="dropdown">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Jobs and Groups <span class="caret"></span></a>
+		<ul class="dropdown-menu" role="menu">
+			<li><a href="jobactivity.html">Job Activity</a></li>
+			<li><a href="upcominggroups.html">Upcoming Groups</a></li>
+		</ul>
+	  </li>	
+	  <li><a href="emails.html">Emails</a></li>
+	  <li><a href="participation.html">Participation</a></li>
+	  <li><a href="profileform.html">Profile Form</a></li>
+      </ul>
+    </nav>
+</div>

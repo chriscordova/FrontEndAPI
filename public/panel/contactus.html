@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<title>CP Demo Panel - Contact Profiler</title>
+		<meta name="generator" content="Bootply" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://bootswatch.com/flatly/bootstrap.min.css">
+	</head>
+	<body>
+
+<header class="navbar navbar-default navbar-static-top" id="nav-header" role="banner"></header>
+
+<!-- Begin Body -->
+<div class="container">
+	<div class="row">
+  			<div class="col-md-3" id="leftCol"></div>  
+      		<div class="col-md-9">
+              	<div id="zone1"></div>
+				<div id="zone2"></div>
+				<h3>Contact Us</h3>
+				<form id="contact" class="form-horizontal">
+					<div class="form-group">
+						<label for="inputSubject" class="col-sm-2 control-label">Subject</label>
+						<div class="col-sm-10">
+							<select name="subject" id="subject" class="form-control" required>
+								<option value="">Choose One..</option>
+								<option value="Sign Up">Sign Up</option>
+								<option value="Technical Issue - Site">Technical Issue - Site</option>
+								<option value="Technical Issue - Survey">Technical Issue - Survey</option>
+								<option value="Rewards Enquiry">Rewards Enquiry</option>
+								<option value="General Enquiry">General Enquiry</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="inputName" class="col-sm-2 control-label">Name</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" name="name" required></input>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="inputName" class="col-sm-2 control-label">Email Address</label>
+						<div class="col-sm-10">
+							<input type="email" class="form-control" name="emailaddress" required></input>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="inputName" class="col-sm-2 control-label">Message</label>
+						<div class="col-sm-10">
+							<textarea id="content" class="form-control" rows="10" name="content" required></textarea>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="" class="col-sm-2 control-label"></label>
+						<div class="col-sm-10">
+							<input class="btn btn-default" type="button" id="sendmessage" value="Submit"></input>
+						</div>
+					</div>
+				</form>
+				<div class="alert alert-danger" role="alert" id="contact-fail" style="display: none;">
+				  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+				  <span class="message"></span>
+				</div>
+				<div class="alert alert-success" role="alert" id="contact-success" style="display: none;">
+				  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+				  <span class="message"></span>
+				</div>
+      		</div> 
+  	</div>
+</div>
+
+<footer class="footer" style="  background: #2c3e50; height: 60px; margin-top: 60px;"></footer>
+
+
+
+	<!-- script references -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+		<!-- Latest compiled and minified JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<!--		<script src="../Resources/script.js" type="text/javascript"></script>
+		<script src="../Resources/api.contactus.js" type="text/javascript"></script>-->
+		<script src="../Resources/CPBase.js" type="text/javascript"></script>
+		<script src="../Resources/CPContactUs.js" type="text/javascript"></script>
+	</body>
+</html>
