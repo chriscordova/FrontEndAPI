@@ -1,14 +1,15 @@
+/// <reference path="../../typings/knockout/knockout.d.ts"/>
 CP.Redeem = CP.extend(CP.emptyFn, {
-	
-	constructor: function(){
+
+	constructor: function () {
 		CP.shouldIBeHere('member');
 		this.initPage();
 	},
-	
-	initPage: function(){
+
+	initPage: function () {
 		this.initForm();
 	},
-	
+
 	initPageContent: function () {
 
 	},
@@ -16,50 +17,48 @@ CP.Redeem = CP.extend(CP.emptyFn, {
 	setPageContent: function () {
 
 	},
-	
-	initForm: function(){
-		//Get Offer Groups and Offers
+
+	initForm: function () {
+		var pageObj = this;
+		
 		var data = {
 			action: "GetRedeemOfferGroupsAndLists",
 			token: CP.apiTOKEN()
 		};
 
-		var groups;
-		var aGroups;
-
-		function OfferGroupsViewModel() {
-			var self = this;
-			self.groups = ko.observable();
-			self.imageSource = ko.observable();
-
-			self.loadGroups = function (e) {
-				self.groups = e;
-			};
-
-			self.goToOffers = function (group) {
-				var id = group.groupid;
-				document.location.href = "offers.html?offerid=" + id;
-			};
-
-			self.imageSource = function (group) {
-				var logohref = CP.apiOrigin() + group.logoURL;
-				return logohref;
-			};
-
-			self.loadGroups(groups);
-
-		}
-
 		$.post(CP.apiURL(), data, function (response) {
-			var o = response;
-			aGroups = o.Data.offergroupswithlist;
-			groups = {
-				"offergroups": aGroups
+			var obj = response;
+			var aGroups = obj.Data.offergroupswithlist;
+			var groups = {
+				"offerGroups": aGroups
 			};
-			ko.applyBindings(new OfferGroupsViewModel());
+			ko.applyBindings(new pageObj.offerGroupsViewModel(groups));
 		});
+	},
+
+	offerGroupsViewModel: function (data) {
+		var self = this;
+		self.groups = ko.observable();
+		self.imageSource = ko.observable();
+
+		self.loadGroups = function (e) {
+			self.groups = e;
+		};
+
+		self.goToOffers = function (id) {
+			document.location.href = "offers.html?offerid=" + id;
+		};
+
+		self.imageSource = function (url) {
+			var logohref = CP.apiOrigin() + url;
+			return logohref;
+		};
+
+		self.loadGroups(data);
+		
+		ko.mapping.fromJS(data, {}, self);
 	}
-	
+
 });
 
 CP.CurrentPage = new CP.Redeem();
