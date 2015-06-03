@@ -23,7 +23,25 @@
   			<div class="col-md-3" id="leftCol"></div>  
       		<div class="col-md-9">
 				<h3>Participation History</h3>
-              	<div id="dvParticipation"></div>
+              	<table class='table table-striped' id='participation-table'>
+					  <thead>
+						  <th>Event Title</th>
+						  <th>Event Type</th>
+						  <th>Credits</th>
+						  <th>Date</th>
+					  </thead>
+					  <tbody>
+						<!-- ko foreach: participationData()-->
+						<tr>
+							<td data-bind="text: $data.eventtitle"></td>
+							<td data-bind="text: $data.eventtype"></td>
+							<td data-bind="text: $data.credits"></td>
+							<td data-bind="text: $data.createdate"></td>
+						</tr>
+						<!-- /ko -->
+					  </tbody>
+					  
+				</table>
       		</div> 
   	</div>
 </div>
@@ -35,6 +53,8 @@
 		<!-- Latest compiled and minified JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 		<script src="../Resources/CPBase.js" type="text/javascript"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js" type="text/javascript"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.min.js"></script>
 		<script src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js" type="text/javascript"></script>
 		<script src="../Resources/CPParticipation.js" type="text/javascript"></script>
 		
