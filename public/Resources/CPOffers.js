@@ -40,7 +40,7 @@ CP.Offers = CP.extend(CP.emptyFn, {
 			if (value.groupid == offerid) {
 				$.each(this.offerlist, function (i, v) {
 					var bAvailableCards = v.cardsavailable;
-					if (bAvailableCards || CP.isNullOrEmpty(bAvailableCards)) {
+					if (bAvailableCards) {
 						var nTitle = v.title;
 						var nDescription = v.pagedescription;
 						var nElectronic = v.iselectronic;
