@@ -58,19 +58,9 @@ CP.Form = CP.extend(CP.emptyFn, {
 		var sBuild = "";
 		var sControl = "";
 		sBuild += "<table class='table' id='" + AttributeId + "'><tr><th colspan='2'>" + QuestionText + "</th></tr>";
-
+		
 		if (DropDown) {
-			switch (DataType) {
-				case "Multiple Selection List":
-					sControl = "multiple";
-					break;
-				case "Single Selection List":
-					sControl = "";
-					break;
-				default:
-					break;
-			}
-
+			sControl = CP.getControlFromDataType(DataType, true);
 			sBuild += "<tr><td><select " + sControl + " class='form-control'>";
 			sBuild += "<option value=''>Select...</option>";
 			$.each(ListItems, function (i, v) {
@@ -80,32 +70,7 @@ CP.Form = CP.extend(CP.emptyFn, {
 			sBuild += "</td></tr>";
 		}
 		else {
-			switch (DataType) {
-				case "Multiple Selection List":
-					sControl = "checkbox";
-					break;
-				case "Single Selection List":
-					sControl = "radio";
-					break;
-				case "Numeric":
-					sControl = "number";
-					break;
-				case "Decimal":
-					sControl = "number";
-					break;
-				case "Date and Time":
-					sControl = "date";
-					break;
-				case "Currency":
-					sControl = "number";
-					break;
-				case "Text":
-					sControl = "text";
-					break;
-				default:
-					break;
-			}
-
+			sControl = CP.getControlFromDataType(DataType, false);
 			if (sControl == "text" || sControl == "number" || sControl == "date") {
 				sBuild += "<tr><td>";
 				if (Currency) {
@@ -243,46 +208,7 @@ CP.Form = CP.extend(CP.emptyFn, {
 
 			if (!bHidden) {
 				if (oInput.length > 0) {
-					var oInputType = $(oInput).attr('type');
-					switch (oInputType) {
-						case "text":
-						case "number":
-							sValues = $(oInput).val();
-							break;
-						case "date":
-							var dateValue = $(oInput).val();
-							var bMatch = dateValue.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-							if (bMatch) {
-								sValues = bMatch[3] + "/" + bMatch[2] + "/" + bMatch[1];
-							}
-							break;
-						case "radio":
-							$.each(oInput, function (i, v) {
-								var bChecked = $(v).is(':checked');
-								if (bChecked) {
-									var sVal = $(v).val();
-									sValues += sVal;
-									if (sVal == '999') {
-										var otherInput = $(v).closest('td').next().find('input');
-										if (otherInput.length > 0) {
-											var otherValue = otherInput.val();
-											sValues += '|' + otherValue;
-										}
-									}
-								}
-							});
-							break;
-						case "checkbox":
-							$.each(oInput, function (i, v) {
-								var bChecked = $(v).is(':checked');
-								if (bChecked) {
-									sValues += $(v).val() + "|";
-								}
-							});
-							break;
-						default:
-							break;
-					}
+					sValues = CP.getValuesFromInputType(oInput);
 				}
 				else if (oSelect.length > 0) {
 					var oSelectType = $(oSelect).attr('multiple');

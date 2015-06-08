@@ -199,12 +199,12 @@ var CP = {
 
     apiURL: function () {
         return "http://www.cpdemo.com.au/api.ashx";
-//		return "http://localhost:64904/ContactProfiler/api.ashx";
+		//		return "http://localhost:64904/ContactProfiler/api.ashx";
     },
 
     apiOrigin: function () {
         return "http://www.cpdemo.com.au/";
-//		return "http://localhost:64904/ContactProfiler/";
+		//		return "http://localhost:64904/ContactProfiler/";
     },
 
     apiTOKEN: function () {
@@ -272,12 +272,11 @@ var CP = {
 			var sType = v.type;
 			if (sType == undefined) {
 				var sClass = v.className;
-				switch (sClass)
-				{
+				switch (sClass) {
 					case 'radio':
 						var oInput = oField.find('input')[0];
 						var oRadioGroup = $(oInput).attr('name');
-						if (!$("input[name='"+ oRadioGroup +"']:checked").val()){
+						if (!$("input[name='" + oRadioGroup + "']:checked").val()) {
 							iCount++;
 							oFormGroup.removeClass('has-success');
 							oFormGroup.addClass('has-error');
@@ -286,7 +285,7 @@ var CP = {
 							oFormGroup.removeClass('has-error');
 							oFormGroup.addClass('has-success');
 						}
-					break;
+						break;
 				}
 
 			}
@@ -400,13 +399,112 @@ var CP = {
 		var aOrder = a.sortorder;
 		var bOrder = b.sortorder;
 		return ((aOrder < bOrder) ? -1 : ((aOrder > bOrder) ? 1 : 0));
+	},
+	
+	apiRequest: function(){
+		
+	},
+	
+	getValuesFromInputType: function (oInput) {
+		var sValues = "";
+		var oInputType = $(oInput).attr('type');
+		switch (oInputType) {
+			case "text":
+			case "number":
+				sValues = $(oInput).val();
+				break;
+			case "date":
+				var dateValue = $(oInput).val();
+				var bMatch = dateValue.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+				if (bMatch) {
+					sValues = bMatch[3] + "/" + bMatch[2] + "/" + bMatch[1];
+				}
+				break;
+			case "radio":
+				$.each(oInput, function (i, v) {
+					var bChecked = $(v).is(':checked');
+					if (bChecked) {
+						var sVal = $(v).val();
+						sValues += sVal;
+						if (sVal == '999') {
+							var otherInput = $(v).closest('td').next().find('input');
+							if (otherInput.length > 0) {
+								var otherValue = otherInput.val();
+								sValues += '|' + otherValue;
+							}
+						}
+					}
+				});
+				break;
+			case "checkbox":
+				$.each(oInput, function (i, v) {
+					var bChecked = $(v).is(':checked');
+					if (bChecked) {
+						sValues += $(v).val() + "|";
+					}
+				});
+				break;
+			default:
+				break;
+		}
+		
+		return sValues;
+	},
+
+	getControlFromDataType: function (dataType, bDropDown) {
+		var sControl = '';
+		switch (dataType) {
+			case CP.Enums.DataTypes.MultipleSelectionList:
+				sControl = "checkbox";
+				break;
+			case CP.Enums.DataTypes.SingleSelectionList:
+				if (!bDropDown) {
+					sControl = "radio";
+				}
+				break;
+			case CP.Enums.DataTypes.DateAndTime:
+				sControl = "number";
+				break;
+			case CP.Enums.DataTypes.Decimal:
+			case CP.Enums.DataTypes.Numeric:
+			case CP.Enums.DataTypes.Currency:
+				sControl = "number";
+				break;
+			case CP.Enums.DataTypes.Text:
+				sControl = "text";
+				break;
+			default:
+				break;
+		}
+
+		return sControl;
+	}
+};
+
+CP.Enums = {
+	DataTypes: {
+		MultipleSelectionList: 'Multiple Selection List',
+		SingleSelectionList: 'Single Selection List',
+		Numeric: 'Numeric',
+		Decimal: 'Decimal',
+		DateAndTime: 'Date and Time',
+		Currency: 'Currency',
+		Text: 'Text'
+	},
+
+	InputTypes: {
+		0: "text",
+		1: "number",
+		2: "email",
+		3: "radio",
+		4: "checkbox"
 	}
 };
 
 CP.Data = {
-	nzStates: ['Auckland','Bay Of Plenty','Canterbury','Chatham Islands','Gisborne','Hawke\s Bay','Manawatu','Marlborough','Nelson','Northland','Otago','Southland','Taranaki','Tasman','Waikato','Wellington','West Coast'],
-	
-	auStates: ['NSW','VIC','NT','QLD','SA','WA','TAS']
+	nzStates: ['Auckland', 'Bay Of Plenty', 'Canterbury', 'Chatham Islands', 'Gisborne', 'Hawke\s Bay', 'Manawatu', 'Marlborough', 'Nelson', 'Northland', 'Otago', 'Southland', 'Taranaki', 'Tasman', 'Waikato', 'Wellington', 'West Coast'],
+
+	auStates: ['NSW', 'VIC', 'NT', 'QLD', 'SA', 'WA', 'TAS']
 };
 
 CP.Message = {
@@ -418,9 +516,9 @@ CP.Message = {
 	emailAddressesDoNotMatch: "Email Addresses do not match.",
 
 	lostPasswordEmail: "Lost password email has been sent",
-	
+
 	emptyEmails: "No Panel Member Emails",
-	
+
 	emptyParticipation: "No Participation History",
 
 	getError: function (obj) {
