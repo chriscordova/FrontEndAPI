@@ -24,40 +24,69 @@ CP.Form = CP.extend(CP.emptyFn, {
 	setPageContent: function () {
 
 	},
-	
-	attributesViewModel: function(data){
+
+	AttributeViewModel: function (id) {
 		var self = this;
-		self.questiontext = ko.observable();
-		self.title = ko.observable();
-		self.shortcode = ko.observable();
-		self.listitems = ko.observableArray();
-		self.properties = ko.observableArray();
+		self.listitems = ko.observableArray([]);
+
+		var oData = {
+			action: "GetAttributeDetails",
+			token: CP.apiTOKEN(),
+			attributeid: id,
+			postregistration: false
+		};
+
+		$.ajaxSetup({
+			async: false
+		});
+
+		var aItems = {};
+		var req = $.post(CP.apiURL(), oData);
+		
+		req.done(function(response){
+			aItems = response.Data.attribute[0].listitems;
+			ko.mapping.fromJS(aItems, {}, self);
+		});
 	},
-	
-	formViewModel: function (data, pageObj) {
+
+	FormViewModel: function (data, pageObj) {
 		var self = this;
 		self.forms = ko.observableArray([]);
 		self.setAttributes = ko.observableArray();
 		self.attributeid = ko.observable();
+		self.attributeData = new pageObj.AttributeViewModel('406f2b2d-0d82-46a4-8529-a48848a87a3a');
 		
 		self.loadForms = function (e) {
 			self.forms = e;
 		};
-		
-		self.getAttributes = function(id){
+
+		self.getAttributeTitle = function (id) {
 			var oData = {
 				action: "GetAttributeDetails",
 				token: CP.apiTOKEN(),
 				attributeid: id,
 				postregistration: false
 			};
-			
-			$.post(CP.apiURL(), oData, function(response){
-				var obj = response.Data.attribute[0];
+
+			$.ajaxSetup({
+				async: false
 			});
+
+			var sTitle = '';
+
+			$.post(CP.apiURL(), oData, function (response) {
+				sTitle = response.Data.attribute[0].questiontext;
+			});
+
+			$.ajaxSetup({
+				async: true
+			});
+
+			return sTitle;
 		};
 
 		self.loadForms(data);
+
 		ko.mapping.fromJS(data, {}, self);
 	},
 
@@ -87,8 +116,9 @@ CP.Form = CP.extend(CP.emptyFn, {
 					"formData": arr[0].formpages
 				};
 
-				var formVM = new pageObj.formViewModel(forms, pageObj);
+				var formVM = new pageObj.FormViewModel(forms, pageObj);
 				ko.applyBindings(formVM);
+				alert('sdfsdf');
 			}
 		});
 		
