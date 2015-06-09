@@ -1,3 +1,4 @@
+/// <reference path="../../typings/knockout/knockout.d.ts"/>
 CP.Form = CP.extend(CP.emptyFn, {
 
 	constructor: function () {
@@ -23,13 +24,22 @@ CP.Form = CP.extend(CP.emptyFn, {
 	setPageContent: function () {
 
 	},
-
-	BuildFormModel: function (data, pageObj) {
+	
+	attributesViewModel: function(data){
+		var self = this;
+		self.questiontext = ko.observable();
+		self.title = ko.observable();
+		self.shortcode = ko.observable();
+		self.listitems = ko.observableArray();
+		self.properties = ko.observableArray();
+	},
+	
+	formViewModel: function (data, pageObj) {
 		var self = this;
 		self.forms = ko.observableArray([]);
 		self.setAttributes = ko.observableArray();
 		self.attributeid = ko.observable();
-
+		
 		self.loadForms = function (e) {
 			self.forms = e;
 		};
@@ -43,7 +53,7 @@ CP.Form = CP.extend(CP.emptyFn, {
 			};
 			
 			$.post(CP.apiURL(), oData, function(response){
-				self.setAttributes.push(response.Data.attribute[0].questiontext);
+				var obj = response.Data.attribute[0];
 			});
 		};
 
@@ -77,10 +87,11 @@ CP.Form = CP.extend(CP.emptyFn, {
 					"formData": arr[0].formpages
 				};
 
-				var buildFormVM = new pageObj.BuildFormModel(forms, pageObj);
-				ko.applyBindings(buildFormVM);
+				var formVM = new pageObj.formViewModel(forms, pageObj);
+				ko.applyBindings(formVM);
 			}
 		});
+		
 		
 		//Click Back
 		$(document).on('click', '#back', function () {
