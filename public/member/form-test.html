@@ -22,7 +22,28 @@
   			<div class="col-md-3" id="leftCol"></div>  
       		<div class="col-md-9">
               	<img src="../../Resources/loading.gif" id="loading"/>
-				<div id="dvForm"></div>
+				<div id="dvForm">
+					<!--ko foreach: formData()-->
+					<div class="form-page table" data-bind="attr: { id: $data.pageid() }">
+						<h3 data-bind="html: $data.pagetitle() "></h3>
+						<!--ko foreach: pageitems-->
+						<table class="table" data-bind="attr: { id: $data.attributeid() }">
+							<tbody>
+								<tr>
+									<th colspan="2" data-bind="text: $root.getAttributes($data.attributeid()) "></th>
+								</tr>
+								<tr>
+									<td>
+										
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<!--/ko-->
+					</div>
+					<!--/ko-->
+				</div>
+					
 				<!--<input type="button" class="btn btn-default" id="save-attribute" value="Save"/>-->
 				<div class="alert alert-danger" role="alert" id="save-fail" style="display: none;">
 				  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
@@ -38,14 +59,17 @@
 
 <footer class="footer" style="  background: #2c3e50; height: 60px; margin-top: 60px;"></footer>
 
+<script type="text/javascript" id="QuestionType_ChoiceQuestion">
+	
+</script>
 
 	<!-- script references -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 		<!-- Latest compiled and minified JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-<!--		<script src="../Resources/script.js" type="text/javascript"></script>
-		<script src="../Resources/api.form.js" type="text/javascript"></script>-->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js" type="text/javascript"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.min.js"></script>
 		<script src="../Resources/CPBase.js" type="text/javascript"></script>
-		<script src="../Resources/CPForm.js" type="text/javascript"></script>
+		<script src="../Resources/CPForm-Test.js" type="text/javascript"></script>
 	</body>
 </html>
