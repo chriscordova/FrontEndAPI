@@ -463,7 +463,7 @@ var CP = {
 				}
 				break;
 			case CP.Enums.DataTypes.DateAndTime:
-				sControl = "number";
+				sControl = "date";
 				break;
 			case CP.Enums.DataTypes.Decimal:
 			case CP.Enums.DataTypes.Numeric:

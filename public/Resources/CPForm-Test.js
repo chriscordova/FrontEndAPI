@@ -25,42 +25,29 @@ CP.Form = CP.extend(CP.emptyFn, {
 
 	},
 
-	AttributeViewModel: function (id) {
-		var self = this;
-		self.listitems = ko.observableArray([]);
-
-		var oData = {
-			action: "GetAttributeDetails",
-			token: CP.apiTOKEN(),
-			attributeid: id,
-			postregistration: false
-		};
-
-		$.ajaxSetup({
-			async: false
-		});
-
-		var aItems = {};
-		var req = $.post(CP.apiURL(), oData);
-		
-		req.done(function(response){
-			aItems = response.Data.attribute[0].listitems;
-			ko.mapping.fromJS(aItems, {}, self);
-		});
-	},
-
 	FormViewModel: function (data, pageObj) {
 		var self = this;
-		self.forms = ko.observableArray([]);
-		self.setAttributes = ko.observableArray();
-		self.attributeid = ko.observable();
-		self.attributeData = new pageObj.AttributeViewModel('406f2b2d-0d82-46a4-8529-a48848a87a3a');
+		self.formdata = ko.observableArray();
+		self.attributedata = ko.observableArray();
+		self.attributetitle = ko.observable();
+		self.attributeshortcode = ko.observable();
+		self.questiontype = ko.observable();
+		self.showthispage = ko.observable();
 		
-		self.loadForms = function (e) {
-			self.forms = e;
+		self.loadFormData = function(e){
+			self.formdata = e;
 		};
-
-		self.getAttributeTitle = function (id) {
+		
+		self.checkVisibility = function(index){
+			if (index > 0){
+				self.showthispage = false;
+			}
+			else {
+				self.showthispage = true;
+			}
+		};
+		
+		self.getAttributeData = function (id) {
 			var oData = {
 				action: "GetAttributeDetails",
 				token: CP.apiTOKEN(),
@@ -72,25 +59,69 @@ CP.Form = CP.extend(CP.emptyFn, {
 				async: false
 			});
 
+			var aItems = {};
 			var sTitle = '';
+			var sShortCode = '';
+			var sQuestionType = '';
+			var sInputType = '';
+			var bDropDown = false;
+			var req = $.post(CP.apiURL(), oData);
 
-			$.post(CP.apiURL(), oData, function (response) {
+			req.done(function (response) {
+				aItems = {
+					"attributeData": response.Data.attribute[0].listitems
+				};
+				
+				bDropDown = pageObj.isDropDownQuestion(response.Data.attribute[0].properties);
+				
 				sTitle = response.Data.attribute[0].questiontext;
+				sShortCode = response.Data.attribute[0].shortcode;
+				sQuestionType = response.Data.attribute[0].datatype;
+				
+				self.attributedata = aItems;
+				self.attributetitle = sTitle;
+				self.attributeshortcode = sShortCode;
+				if (bDropDown){
+					self.questiontype = 'QuestionType_DropDownQuestion';	
+				}
+				else {
+					sInputType = CP.getControlFromDataType(sQuestionType, bDropDown);
+					self.questiontype = pageObj.getQuestionTemplate(sInputType);
+				}
+				
+				
 			});
-
-			$.ajaxSetup({
-				async: true
-			});
-
-			return sTitle;
 		};
-
-		self.loadForms(data);
-
-		ko.mapping.fromJS(data, {}, self);
+		
+		self.loadFormData(data);
+		
 	},
 
-	attributeData: {},
+	getQuestionTemplate: function(inputType){
+		var sTemplate = '';
+		switch (inputType){
+			case "radio":
+				sTemplate = 'QuestionType_SingleChoiceQuestion';
+				break;
+			case "checkbox":
+				sTemplate = 'QuestionType_MultipleChoiceQuestion';
+				break;
+			case "number":
+			case "decimal":
+				sTemplate = 'QuestionType_NumericQuestion';
+				break;
+			case "text":
+				sTemplate = 'QuestionType_TextQuestion';
+				break;
+			case "date":
+				sTemplate = 'QuestionType_DateQuestion';
+				break;
+			default:
+				break;
+		}
+		
+		return sTemplate;
+	},
 
 	initForm: function () {
 		var pageObj = this;
@@ -112,13 +143,12 @@ CP.Form = CP.extend(CP.emptyFn, {
 					return (n.formid == sFormId);
 				});
 
-				var forms = {
+				var oForms = {
 					"formData": arr[0].formpages
 				};
 
-				var formVM = new pageObj.FormViewModel(forms, pageObj);
+				var formVM = new pageObj.FormViewModel(oForms, pageObj);
 				ko.applyBindings(formVM);
-				alert('sdfsdf');
 			}
 		});
 		
