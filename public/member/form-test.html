@@ -26,27 +26,21 @@
 						<!--/ko-->
 						<div class="form-page table" data-bind="attr: { id: pageid }, visible: $root.showthispage ">
 							<h3 data-bind="html: pagetitle "></h3>
-							<!--ko foreach: $data.pageitems -->
+							<!--ko foreach: $data.pageitems.sort(CP.sortBySortOrder) -->
+							<!--ko with: $root.getHiddenRules(hiddenattributes)--><!--/ko-->
 							<table class="table" data-bind="attr: { id: attributeid }">
 								<tbody>
 									<tr>
-										<!--ko with: $root.getAttributeData(attributeid)-->
-										<!--/ko-->
-										<td data-bind="template: { name: $root.questiontype }"></td>
+										<!--ko with: $root.getAttributeData(attributeid)--><!--/ko-->
+										<td data-bind="template: { name: $root.questiontype } "></td>
 									</tr>
 								</tbody>
 							</table>
 							<!--/ko-->
-							<!--ko if: $index() !==0 -->
+							<!--ko if: $index() !== 0 -->
 							<input type='button' class='btn btn-default' id='back' value='Back' />&nbsp;
 							<!--/ko-->
-							<!--ko if: $index()===( $parent.length - 1)-->
-							<input type='button' class='btn btn-default' id='save-attribute' value='Save and Finish' />
-							<!--/ko-->
-							<!--ko ifnot: $index()===( $parent.length - 1)-->
-							<input type='button' class='btn btn-default' id='save-attribute' value='Save and Next' />&nbsp;
-							<input type='button' class='btn btn-default saveclose' id='save-attribute' value='Save and Close' />
-							<!--/ko-->
+							<!--ko template: $index() === ($parent.formdata.formData.length - 1) ? 'LastFormPage' : 'InnerFormPage'--><!--/ko-->
 						</div>
 						<!--/ko-->
 					</div>
@@ -63,24 +57,35 @@
 			</div>
 		</div>
 		<footer class="footer" style="  background: #2c3e50; height: 60px; margin-top: 60px;"></footer>
+		<script type="text/html" id="LastFormPage">
+			<input type='button' class='btn btn-default' id='save-attribute' value='Save and Finish' />
+		</script>
+		<script type="text/html" id="InnerFormPage">
+			<input type='button' class='btn btn-default' id='save-attribute' value='Save and Next' />&nbsp;
+			<input type='button' class='btn btn-default saveclose' id='save-attribute' value='Save and Close' />
+		</script>
 		<script type="text/html" id="QuestionType_SingleChoiceQuestion">
 			<h4 data-bind="text: $root.attributetitle"></h4>
-				<!--ko foreach: $root.attributedata.attributeData.sort(function(l,r){ return l.value > r.value }) -->
-				<label><input type="radio" data-bind = "value: value, attr: { name: $root.attributeshortcode }"/>&nbsp; <!--ko text: name--> <!--/ko--></label><br />
+				<!--ko foreach: $root.attributedata.attributeData -->
+				<label><input type="radio" data-bind = "value: value, attr: { name: $root.attributeshortcode }"/>&nbsp; <!--ko text: name--> <!--/ko--></label>
+				<!--ko if: value === 999-->
+				&nbsp;&nbsp;&nbsp;<input type='text' name='" + ShortCode + "' id='other'/>
+				<!--/ko-->
+				<br />
 				<!--/ko-->
 		</script>
 		<script type="text/html" id="QuestionType_DropDownQuestion">
 			<h4 data-bind="text: $root.attributetitle"></h4>
 			<select class="form-control">
 				<option value="">Select..</option>
-				<!--ko foreach: $root.attributedata.attributeData.sort(function(l,r){ return l.value > r.value }) -->
+				<!--ko foreach: $root.attributedata.attributeData -->
 				<option data-bind="text: name, value: value, attr: { name: $root.attributeshortcode }"></option>
 				<!--/ko-->
 			</select>
 		</script>
 		<script type="text/html" id="QuestionType_MultipleChoiceQuestion">
 			<h4 data-bind="text: $root.attributetitle"></h4>
-				<!--ko foreach: $root.attributedata.attributeData.sort(function(l,r){ return l.value > r.value }) -->
+				<!--ko foreach: $root.attributedata.attributeData -->
 				<label><input type="checkbox" data-bind = "value: value, attr: { name: $root.attributeshortcode }"/>&nbsp; <!--ko text: name--> <!--/ko--></label><br />
 				<!--/ko-->
 		</script>
@@ -90,6 +95,7 @@
 		</script>
 		<script type="text/html" id="QuestionType_NumericQuestion">
 			<h4 data-bind="text: $root.attributetitle"></h4>
+				<!--ko if: $root.usecurrency-->$<!--/ko-->
 				<input type="number" data-bind = "attr: { name: $root.attributeshortcode }"/>
 		</script>
 		<script type="text/html" id="QuestionType_DateQuestion">

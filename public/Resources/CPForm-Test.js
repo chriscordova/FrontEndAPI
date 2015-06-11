@@ -10,11 +10,7 @@ CP.Form = CP.extend(CP.emptyFn, {
 
 	initPage: function () {
 		var pageObj = this;
-		$(document).ajaxComplete(function () {
-			pageObj.createHiddenRules(pageObj.aHiddenRules);
-		});
-
-		this.initForm();
+		pageObj.initForm();
 	},
 
 	initPageContent: function () {
@@ -33,20 +29,28 @@ CP.Form = CP.extend(CP.emptyFn, {
 		self.attributeshortcode = ko.observable();
 		self.questiontype = ko.observable();
 		self.showthispage = ko.observable();
+		self.usecurrency = ko.observable();
+		// self.hiddenrules = ko.observableArray();
+
+		self.getHiddenRules = function (e) {
+			pageObj.aHiddenRules = [];
+			$.each(e, function (i, v) {
+				pageObj.aHiddenRules.push(v);
+			});
+		};
 		
-		self.loadFormData = function(e){
+		self.setAttributeValues = function(a,b,c){
+			pageObj.setAttributeValues(a, b, c);	
+		};
+
+		self.loadFormData = function (e) {
 			self.formdata = e;
 		};
-		
-		self.checkVisibility = function(index){
-			if (index > 0){
-				self.showthispage = false;
-			}
-			else {
-				self.showthispage = true;
-			}
+
+		self.checkVisibility = function (index) {
+			self.showthispage = index > 0 ? false : true;
 		};
-		
+
 		self.getAttributeData = function (id) {
 			var oData = {
 				action: "GetAttributeDetails",
@@ -65,41 +69,79 @@ CP.Form = CP.extend(CP.emptyFn, {
 			var sQuestionType = '';
 			var sInputType = '';
 			var bDropDown = false;
+			var bCurrency = false;
 			var req = $.post(CP.apiURL(), oData);
 
 			req.done(function (response) {
 				aItems = {
 					"attributeData": response.Data.attribute[0].listitems
 				};
-				
+
 				bDropDown = pageObj.isDropDownQuestion(response.Data.attribute[0].properties);
-				
+				bCurrency = pageObj.isCurrencyQuestion(response.Data.attribute[0].properties);
 				sTitle = response.Data.attribute[0].questiontext;
 				sShortCode = response.Data.attribute[0].shortcode;
 				sQuestionType = response.Data.attribute[0].datatype;
-				
+
 				self.attributedata = aItems;
 				self.attributetitle = sTitle;
 				self.attributeshortcode = sShortCode;
-				if (bDropDown){
-					self.questiontype = 'QuestionType_DropDownQuestion';	
+				if (bDropDown) {
+					self.questiontype = 'QuestionType_DropDownQuestion';
 				}
 				else {
 					sInputType = CP.getControlFromDataType(sQuestionType, bDropDown);
 					self.questiontype = pageObj.getQuestionTemplate(sInputType);
 				}
-				
-				
+				self.usecurrency = bCurrency;
+				var oAttributeData = response.Data.attribute[0].attributedata[0];
+				if (CP.isNotNullOrEmpty(oAttributeData)){
+					self.setAttributeValues(oAttributeData, sQuestionType, bDropDown);	
+				}
 			});
 		};
-		
+
 		self.loadFormData(data);
-		
+
 	},
 
-	getQuestionTemplate: function(inputType){
+	setHiddenRules: function (items) {
+		$.each(items, function (i, v) {
+			var attributeToHide = v.attributeid;
+			var choicesSelectedToShow = v.datachoices.split(',');
+			var thisAttribute = v.pageitemattributeid;
+			var ruleType = v.ruletype;
+			if (ruleType == 8) {
+				var inputs = $('#' + thisAttribute).find('input');
+				$('#' + attributeToHide).hide();
+				$.each(inputs, function (i, v) {
+					if ($(v).is(':checked')) {
+						if ($.inArray($(v).val(), choicesSelectedToShow) >= 0) {
+							$('#' + attributeToHide).show();
+						}
+					}
+				});
+
+				$('#' + thisAttribute).on('change', function () {
+					var inputs = $(this).find('input');
+					$.each(inputs, function (i, v) {
+						if ($(v).is(':checked')) {
+							if ($.inArray($(v).val(), choicesSelectedToShow) >= 0) {
+								$('#' + attributeToHide).show();
+							}
+							else {
+								$('#' + attributeToHide).hide();
+							}
+						}
+					});
+				});
+			}
+		});
+	},
+
+	getQuestionTemplate: function (inputType) {
 		var sTemplate = '';
-		switch (inputType){
+		switch (inputType) {
 			case "radio":
 				sTemplate = 'QuestionType_SingleChoiceQuestion';
 				break;
@@ -119,7 +161,7 @@ CP.Form = CP.extend(CP.emptyFn, {
 			default:
 				break;
 		}
-		
+
 		return sTemplate;
 	},
 
@@ -152,7 +194,11 @@ CP.Form = CP.extend(CP.emptyFn, {
 			}
 		});
 		
-		
+		//Load Hidden Rules Stuff here?
+		$(document).ajaxComplete(function(){
+			pageObj.setHiddenRules(pageObj.aHiddenRules);	
+		});
+				
 		//Click Back
 		$(document).on('click', '#back', function () {
 			pageObj.clickBack(this);
@@ -164,133 +210,7 @@ CP.Form = CP.extend(CP.emptyFn, {
 		});
 
 	},
-
-	buildAttributeQuestion: function (QuestionText, DataType, DropDown, Currency, ListItems, ShortCode, AttributeId, PageId) {
-		var sBuild = "";
-		var sControl = "";
-		sBuild += "<table class='table' id='" + AttributeId + "'><tr><th colspan='2'>" + QuestionText + "</th></tr>";
-
-		if (DropDown) {
-			sControl = CP.getControlFromDataType(DataType, true);
-			sBuild += "<tr><td><select " + sControl + " class='form-control'>";
-			sBuild += "<option value=''>Select...</option>";
-			$.each(ListItems, function (i, v) {
-				sBuild += "<option name='" + ShortCode + "' value='" + v.value + "'>" + v.name + "</option>";
-			});
-
-			sBuild += "</td></tr>";
-		}
-		else {
-			sControl = CP.getControlFromDataType(DataType, false);
-			if (sControl == "text" || sControl == "number" || sControl == "date") {
-				sBuild += "<tr><td>";
-				if (Currency) {
-					sBuild += "$";
-				}
-				sBuild += "<input type='" + sControl + "' name='" + ShortCode + "'/>";
-				sBuild += "</td></tr>";
-			}
-			else {
-				$.each(ListItems, function (i, v) {
-					sBuild += "<tr><td>";
-					sBuild += "<label><input type='" + sControl + "' name='" + ShortCode + "' value='" + v.value + "'/> " + v.name + "</label>";
-					sBuild += "</td>";
-					if (v.value == "999") {
-						sBuild += "<td><input type='text' name='" + ShortCode + "' id='other'/></td>";
-					}
-					sBuild += "</tr>";
-				});
-			}
-
-		}
-
-		sBuild += '</table>';
-
-		var pageForm = $('#' + PageId);
-		var aTables = pageForm.find('table');
-		if (aTables.length > 0) {
-			var aLast = pageForm.find('table').last();
-			$(sBuild).insertAfter(aLast);
-		}
-		else {
-			$(sBuild).insertAfter('#' + PageId + ' h3');
-		}
-	},
-
-	buildForm: function (oData) {
-		var pageObj = this;
-		var sTable = "";
-		var sFormId = CP.getURLParam("formid");
-		$('#dvForm').attr('formid', sFormId);
-		var aFormGroups = oData.formgroups.sort(CP.sortBySortOrder);
-		$.each(aFormGroups, function (i, v) {
-			var aForms = v.forms.sort(CP.sortBySortOrder);
-			$.each(aForms, function (i, v) {
-				if (v.formid == sFormId) {
-					var aFormPages = v.formpages.sort(CP.sortBySortOrder);
-					var iPages = aFormPages.length;
-					$.each(aFormPages, function (i, v) {
-						var sPageId = v.pageid;
-						if (i > 0) {
-							sTable += "<div class='form-page table' style='display: none;' id='" + sPageId + "'>";
-						}
-						else {
-							sTable += "<div class='form-page table' id='" + sPageId + "'>";
-						}
-
-						sTable += "<h3>" + v.pagetitle + "</h3>";
-						var aPageItems = v.pageitems.sort(CP.sortBySortOrder);
-						var aPageItemsList = [];
-						$.each(aPageItems, function (i, v) {
-							//do hidden stuff here
-							var aHiddenItems = v.hiddenattributes;
-							if (aHiddenItems.length > 0) {
-								pageObj.aHiddenRules.push(aHiddenItems);
-							}
-
-							aPageItemsList.push(v);
-
-						});
-
-						deferredPost(0, aPageItemsList.length - 1);
-
-						function deferredPost(index, max) {
-							if (index < max) {
-								var o = pageObj.getAttribute(aPageItemsList[index].attributeid, sPageId);
-								if (o) {
-									setTimeout(function () {
-										deferredPost(index + 1, max);
-									}, 200);
-								}
-							} else {
-								setTimeout(function () {
-									return pageObj.getAttribute(aPageItemsList[index].attributeid, sPageId);
-								}, 200);
-
-							}
-						}
-
-						if (i != 0) {
-							sTable += "<input type='button' class='btn btn-default' id='back' value='Back'/>&nbsp;";
-						}
-
-						if (i == (iPages - 1)) {
-							sTable += "<input type='button' class='btn btn-default' id='save-attribute' value='Save and Finish'/>";
-						}
-						else {
-							sTable += "<input type='button' class='btn btn-default' id='save-attribute' value='Save and Next'/>&nbsp;";
-							sTable += "<input type='button' class='btn btn-default saveclose' id='save-attribute' value='Save and Close'/>";
-						}
-
-						sTable += "</div>";
-					});
-				}
-			});
-		});
-
-		$('#dvForm').append(sTable);
-	},
-
+	
 	clickBack: function (obj) {
 		var thisDiv = $(obj).closest('div');
 		setTimeout(function () {
@@ -357,41 +277,169 @@ CP.Form = CP.extend(CP.emptyFn, {
 		}, 3000);
 	},
 
-	createHiddenRules: function (aHiddenRules) {
-		$.each(aHiddenRules, function (i, items) {
-			$.each(items, function (i, v) {
-				var attributeToHide = v.attributeid;
-				var choicesSelectedToShow = v.datachoices.split(',');
-				var thisAttribute = v.pageitemattributeid;
-				var ruleType = v.ruletype;
-				if (ruleType == 8) {
-					var inputs = $('#' + thisAttribute).find('input');
-					$('#' + attributeToHide).hide();
-					$.each(inputs, function (i, v) {
-						if ($(v).is(':checked')) {
-							if ($.inArray($(v).val(), choicesSelectedToShow) >= 0) {
-								$('#' + attributeToHide).show();
-							}
-						}
-					});
+	// 	buildAttributeQuestion: function (QuestionText, DataType, DropDown, Currency, ListItems, ShortCode, AttributeId, PageId) {
+	// 		var sBuild = "";
+	// 		var sControl = "";
+	// 		sBuild += "<table class='table' id='" + AttributeId + "'><tr><th colspan='2'>" + QuestionText + "</th></tr>";
+	// 
+	// 		if (DropDown) {
+	// 			sControl = CP.getControlFromDataType(DataType, true);
+	// 			sBuild += "<tr><td><select " + sControl + " class='form-control'>";
+	// 			sBuild += "<option value=''>Select...</option>";
+	// 			$.each(ListItems, function (i, v) {
+	// 				sBuild += "<option name='" + ShortCode + "' value='" + v.value + "'>" + v.name + "</option>";
+	// 			});
+	// 
+	// 			sBuild += "</td></tr>";
+	// 		}
+	// 		else {
+	// 			sControl = CP.getControlFromDataType(DataType, false);
+	// 			if (sControl == "text" || sControl == "number" || sControl == "date") {
+	// 				sBuild += "<tr><td>";
+	// 				if (Currency) {
+	// 					sBuild += "$";
+	// 				}
+	// 				sBuild += "<input type='" + sControl + "' name='" + ShortCode + "'/>";
+	// 				sBuild += "</td></tr>";
+	// 			}
+	// 			else {
+	// 				$.each(ListItems, function (i, v) {
+	// 					sBuild += "<tr><td>";
+	// 					sBuild += "<label><input type='" + sControl + "' name='" + ShortCode + "' value='" + v.value + "'/> " + v.name + "</label>";
+	// 					sBuild += "</td>";
+	// 					if (v.value == "999") {
+	// 						sBuild += "<td><input type='text' name='" + ShortCode + "' id='other'/></td>";
+	// 					}
+	// 					sBuild += "</tr>";
+	// 				});
+	// 			}
+	// 
+	// 		}
+	// 
+	// 		sBuild += '</table>';
+	// 
+	// 		var pageForm = $('#' + PageId);
+	// 		var aTables = pageForm.find('table');
+	// 		if (aTables.length > 0) {
+	// 			var aLast = pageForm.find('table').last();
+	// 			$(sBuild).insertAfter(aLast);
+	// 		}
+	// 		else {
+	// 			$(sBuild).insertAfter('#' + PageId + ' h3');
+	// 		}
+	// 	},
 
-					$('#' + thisAttribute).on('change', function () {
-						var inputs = $(this).find('input');
-						$.each(inputs, function (i, v) {
-							if ($(v).is(':checked')) {
-								if ($.inArray($(v).val(), choicesSelectedToShow) >= 0) {
-									$('#' + attributeToHide).show();
-								}
-								else {
-									$('#' + attributeToHide).hide();
-								}
-							}
-						});
-					});
-				}
-			});
-		});
-	},
+	// 	buildForm: function (oData) {
+	// 		var pageObj = this;
+	// 		var sTable = "";
+	// 		var sFormId = CP.getURLParam("formid");
+	// 		$('#dvForm').attr('formid', sFormId);
+	// 		var aFormGroups = oData.formgroups.sort(CP.sortBySortOrder);
+	// 		$.each(aFormGroups, function (i, v) {
+	// 			var aForms = v.forms.sort(CP.sortBySortOrder);
+	// 			$.each(aForms, function (i, v) {
+	// 				if (v.formid == sFormId) {
+	// 					var aFormPages = v.formpages.sort(CP.sortBySortOrder);
+	// 					var iPages = aFormPages.length;
+	// 					$.each(aFormPages, function (i, v) {
+	// 						var sPageId = v.pageid;
+	// 						if (i > 0) {
+	// 							sTable += "<div class='form-page table' style='display: none;' id='" + sPageId + "'>";
+	// 						}
+	// 						else {
+	// 							sTable += "<div class='form-page table' id='" + sPageId + "'>";
+	// 						}
+	// 
+	// 						sTable += "<h3>" + v.pagetitle + "</h3>";
+	// 						var aPageItems = v.pageitems.sort(CP.sortBySortOrder);
+	// 						var aPageItemsList = [];
+	// 						$.each(aPageItems, function (i, v) {
+	// 							//do hidden stuff here
+	// 							var aHiddenItems = v.hiddenattributes;
+	// 							if (aHiddenItems.length > 0) {
+	// 								pageObj.aHiddenRules.push(aHiddenItems);
+	// 							}
+	// 
+	// 							aPageItemsList.push(v);
+	// 
+	// 						});
+	// 
+	// 						deferredPost(0, aPageItemsList.length - 1);
+	// 
+	// 						function deferredPost(index, max) {
+	// 							if (index < max) {
+	// 								var o = pageObj.getAttribute(aPageItemsList[index].attributeid, sPageId);
+	// 								if (o) {
+	// 									setTimeout(function () {
+	// 										deferredPost(index + 1, max);
+	// 									}, 200);
+	// 								}
+	// 							} else {
+	// 								setTimeout(function () {
+	// 									return pageObj.getAttribute(aPageItemsList[index].attributeid, sPageId);
+	// 								}, 200);
+	// 
+	// 							}
+	// 						}
+	// 
+	// 						if (i != 0) {
+	// 							sTable += "<input type='button' class='btn btn-default' id='back' value='Back'/>&nbsp;";
+	// 						}
+	// 
+	// 						if (i == (iPages - 1)) {
+	// 							sTable += "<input type='button' class='btn btn-default' id='save-attribute' value='Save and Finish'/>";
+	// 						}
+	// 						else {
+	// 							sTable += "<input type='button' class='btn btn-default' id='save-attribute' value='Save and Next'/>&nbsp;";
+	// 							sTable += "<input type='button' class='btn btn-default saveclose' id='save-attribute' value='Save and Close'/>";
+	// 						}
+	// 
+	// 						sTable += "</div>";
+	// 					});
+	// 				}
+	// 			});
+	// 		});
+	// 
+	// 		$('#dvForm').append(sTable);
+	// 	},
+
+	
+
+	// 	createHiddenRules: function (aHiddenRules) {
+	// 		$.each(aHiddenRules, function (i, items) {
+	// 			$.each(items, function (i, v) {
+	// 				var attributeToHide = v.attributeid;
+	// 				var choicesSelectedToShow = v.datachoices.split(',');
+	// 				var thisAttribute = v.pageitemattributeid;
+	// 				var ruleType = v.ruletype;
+	// 				if (ruleType == 8) {
+	// 					var inputs = $('#' + thisAttribute).find('input');
+	// 					$('#' + attributeToHide).hide();
+	// 					$.each(inputs, function (i, v) {
+	// 						if ($(v).is(':checked')) {
+	// 							if ($.inArray($(v).val(), choicesSelectedToShow) >= 0) {
+	// 								$('#' + attributeToHide).show();
+	// 							}
+	// 						}
+	// 					});
+	// 
+	// 					$('#' + thisAttribute).on('change', function () {
+	// 						var inputs = $(this).find('input');
+	// 						$.each(inputs, function (i, v) {
+	// 							if ($(v).is(':checked')) {
+	// 								if ($.inArray($(v).val(), choicesSelectedToShow) >= 0) {
+	// 									$('#' + attributeToHide).show();
+	// 								}
+	// 								else {
+	// 									$('#' + attributeToHide).hide();
+	// 								}
+	// 							}
+	// 						});
+	// 					});
+	// 				}
+	// 			});
+	// 		});
+	// 	},
 
 	getAttribute: function (sAttributeId, sPageId) {
 		var pageObj = this;
@@ -522,17 +570,17 @@ CP.Form = CP.extend(CP.emptyFn, {
 				break;
 			case "Single Selection List":
 				if (DropDown) {
-					var oSelect = oAttributeTable.find('select'),
+					var oSelect = $(oAttributeTable[0]).find('select'),
 						iValue = Data.dataint2;
 					$(oSelect).val(iValue);
 				}
 				else {
 					var iValue = Data.dataint2,
-						aInput = oAttributeTable.find('input'),
+						aInput = $(oAttributeTable[0]).find('input'),
 						sOther = Data.other,
 						bSetOther = false;
 
-					if (iValue == '999') {
+					if (iValue === 999) {
 						bSetOther = true;
 					}
 
