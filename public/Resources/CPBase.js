@@ -400,11 +400,25 @@ var CP = {
 		var bOrder = b.sortorder;
 		return ((aOrder < bOrder) ? -1 : ((aOrder > bOrder) ? 1 : 0));
 	},
-	
-	apiRequest: function(){
-		
+
+	apiRequest: function () {
+
 	},
-	
+
+	formatDateForCP: function (date) {
+		var sFormattedDate;
+		var aDate = date.split("/");
+		if (aDate[0].length != 2){
+			aDate[0] = "0" + aDate[0];
+		}
+		
+		aDate[2] = aDate[2].slice(0,4);
+		// var aDate = sValue.slice(0, 10);
+		sFormattedDate = aDate[2] + "-" + aDate[1] + "-" + aDate[0];
+		
+		return sFormattedDate;
+	},
+
 	getValuesFromInputType: function (oInput) {
 		var sValues = "";
 		var oInputType = $(oInput).attr('type');
@@ -427,7 +441,7 @@ var CP = {
 						var sVal = $(v).val();
 						sValues += sVal;
 						if (sVal == '999') {
-							var otherInput = $(v).closest('td').next().find('input');
+							var otherInput = $(v).parent().next();
 							if (otherInput.length > 0) {
 								var otherValue = otherInput.val();
 								sValues += '|' + otherValue;
@@ -447,7 +461,7 @@ var CP = {
 			default:
 				break;
 		}
-		
+
 		return sValues;
 	},
 

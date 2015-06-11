@@ -27,7 +27,6 @@
 						<div class="form-page table" data-bind="attr: { id: pageid }, visible: $root.showthispage ">
 							<h3 data-bind="html: pagetitle "></h3>
 							<!--ko foreach: $data.pageitems.sort(CP.sortBySortOrder) -->
-							<!--ko with: $root.getHiddenRules(hiddenattributes)--><!--/ko-->
 							<table class="table" data-bind="attr: { id: attributeid }">
 								<tbody>
 									<tr>
@@ -35,7 +34,10 @@
 										<td data-bind="template: { name: $root.questiontype } "></td>
 									</tr>
 								</tbody>
+								
 							</table>
+							<!--ko with: $root.setAttributeValues($root.actualattributedata, $root.datatype)--><!--/ko-->
+							<!--ko with: $root.getHiddenRules(hiddenattributes)--><!--/ko-->
 							<!--/ko-->
 							<!--ko if: $index() !== 0 -->
 							<input type='button' class='btn btn-default' id='back' value='Back' />&nbsp;
@@ -66,10 +68,10 @@
 		</script>
 		<script type="text/html" id="QuestionType_SingleChoiceQuestion">
 			<h4 data-bind="text: $root.attributetitle"></h4>
-				<!--ko foreach: $root.attributedata.attributeData -->
+				<!--ko foreach: $root.attributelistitems -->
 				<label><input type="radio" data-bind = "value: value, attr: { name: $root.attributeshortcode }"/>&nbsp; <!--ko text: name--> <!--/ko--></label>
 				<!--ko if: value === 999-->
-				&nbsp;&nbsp;&nbsp;<input type='text' name='" + ShortCode + "' id='other'/>
+				&nbsp;&nbsp;&nbsp;<input type='text' data-bind="attr: { name: $root.attributeshortcode }" id='other'/>
 				<!--/ko-->
 				<br />
 				<!--/ko-->
@@ -78,14 +80,14 @@
 			<h4 data-bind="text: $root.attributetitle"></h4>
 			<select class="form-control">
 				<option value="">Select..</option>
-				<!--ko foreach: $root.attributedata.attributeData -->
+				<!--ko foreach: $root.attributelistitems -->
 				<option data-bind="text: name, value: value, attr: { name: $root.attributeshortcode }"></option>
 				<!--/ko-->
 			</select>
 		</script>
 		<script type="text/html" id="QuestionType_MultipleChoiceQuestion">
 			<h4 data-bind="text: $root.attributetitle"></h4>
-				<!--ko foreach: $root.attributedata.attributeData -->
+				<!--ko foreach: $root.attributelistitems -->
 				<label><input type="checkbox" data-bind = "value: value, attr: { name: $root.attributeshortcode }"/>&nbsp; <!--ko text: name--> <!--/ko--></label><br />
 				<!--/ko-->
 		</script>
