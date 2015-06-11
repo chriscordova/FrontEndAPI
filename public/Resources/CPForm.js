@@ -21,9 +21,40 @@ CP.Form = CP.extend(CP.emptyFn, {
 
 	},
 
+	onDemandObservable: function (callback, target) {
+		var _value = ko.observable();  //private observable
+
+		var result = ko.computed({
+			read: function () {
+				//if it has not been loaded, execute the supplied function
+				if (!result.loaded()) {
+					callback.call(target);
+				}
+				//always return the current value
+				return _value();
+			},
+			write: function (newValue) {
+				//indicate that the value is now loaded and set it
+				result.loaded(true);
+				_value(newValue);
+			},
+			deferEvaluation: true  //do not evaluate immediately when created
+		});
+
+		//expose the current state, which can be bound against
+		result.loaded = ko.observable();
+		//load it again
+		result.refresh = function () {
+			result.loaded(false);
+		};
+
+		return result;
+	},
+
 	FormViewModel: function (data, pageObj) {
 		var self = this;
 		self.formdata = ko.observableArray();
+		self.attribute = ko.observable();
 		self.attributelistitems = ko.observableArray();
 		self.fullattributedata = ko.observableArray();
 		self.attributetitle = ko.observable();
@@ -36,13 +67,11 @@ CP.Form = CP.extend(CP.emptyFn, {
 		self.actualattributedata = ko.observableArray();
 
 		self.getHiddenRules = function (e) {
-			$.each(e, function (i, v) {
-				pageObj.aHiddenRules.push(v);
-			});
+			ko.utils.arrayPushAll(pageObj.aHiddenRules, e);
 		};
-		
-		self.setAttributeValues = function(a,b){
-			pageObj.setAttributeValues(a, b, self.dropdown);	
+
+		self.setAttributeValues = function (a, b) {
+			pageObj.setAttributeValues(a, b, self.dropdown);
 		};
 
 		self.loadFormData = function (e) {
@@ -51,6 +80,11 @@ CP.Form = CP.extend(CP.emptyFn, {
 
 		self.checkVisibility = function (index) {
 			self.showthispage = index > 0 ? false : true;
+		};
+
+		self.loadAttributeData = function (id) {
+			self.attributeid = id;
+			self.getAttributeData(id);
 		};
 
 		self.getAttributeData = function (id) {
@@ -65,22 +99,26 @@ CP.Form = CP.extend(CP.emptyFn, {
 				async: false
 			});
 
-			var sTitle = '', sShortCode = '', sQuestionType = '', sInputType = '', bDropDown = false, bCurrency = false;
-			
-			var req = $.post(CP.apiURL(), oData, self.fullattributedata);
-			req.done(function (response) {
-				bDropDown = pageObj.isDropDownQuestion(response.Data.attribute[0].properties);
-				bCurrency = pageObj.isCurrencyQuestion(response.Data.attribute[0].properties);
-				sTitle = response.Data.attribute[0].questiontext;
-				sShortCode = response.Data.attribute[0].shortcode;
-				sQuestionType = response.Data.attribute[0].datatype;
+			var oAttribute, sTitle = '', sShortCode = '', sQuestionType = '', sInputType = '', bDropDown = false, bCurrency = false;
 
-				self.attributelistitems = response.Data.attribute[0].listitems;
+			var req = $.post(CP.apiURL(), oData, self.fullattributedata);
+
+			req.done(function (response) {
+				oAttribute = response.Data.attribute[0];
+				bDropDown = pageObj.isDropDownQuestion(oAttribute.properties);
+				bCurrency = pageObj.isCurrencyQuestion(oAttribute.properties);
+				sTitle = oAttribute.questiontext;
+				sShortCode = oAttribute.shortcode;
+				sQuestionType = oAttribute.datatype;
+
+				self.attribute = oAttribute;
+				self.attributelistitems = oAttribute.listitems;
 				self.attributetitle = sTitle;
 				self.attributeshortcode = sShortCode;
 				self.datatype = sQuestionType;
 				self.dropdown = bDropDown;
-				
+				self.usecurrency = bCurrency;
+
 				if (bDropDown) {
 					self.questiontype = 'QuestionType_DropDownQuestion';
 				}
@@ -88,13 +126,13 @@ CP.Form = CP.extend(CP.emptyFn, {
 					sInputType = CP.getControlFromDataType(sQuestionType, bDropDown);
 					self.questiontype = pageObj.getQuestionTemplate(sInputType);
 				}
-				self.usecurrency = bCurrency;
-				var oAttributeData = response.Data.attribute[0].attributedata[0];
-				if (CP.isNotNullOrEmpty(oAttributeData)){
-					self.actualattributedata = oAttributeData;	
+
+				var oAttributeData = oAttribute.attributedata[0];
+				if (CP.isNotNullOrEmpty(oAttributeData)) {
+					self.actualattributedata = oAttributeData;
 				}
 			});
-			
+
 			$.ajaxSetup({
 				async: true
 			});
@@ -182,16 +220,16 @@ CP.Form = CP.extend(CP.emptyFn, {
 				var sFormId = CP.getURLParam("formid");
 				var aForms = obj.Data.formgroups;
 				var arr = null;
-				$.each(aForms, function(index, form){
+				$.each(aForms, function (index, form) {
 					arr = $.grep(form.forms, function (n, i) {
 						return n.formid == sFormId;
 					});
-					
-					if (CP.isNotNullOrEmpty(arr)){
+
+					if (CP.isNotNullOrEmpty(arr)) {
 						return false;
 					}
 				});
-				
+
 
 				var oForms = {
 					"formData": arr[0].formpages
@@ -201,8 +239,8 @@ CP.Form = CP.extend(CP.emptyFn, {
 				ko.applyBindings(formVM);
 			}
 		});
-		
-		req.done(function(){
+
+		req.done(function () {
 			pageObj.setHiddenRules(pageObj.aHiddenRules);
 		});
 				
@@ -217,7 +255,7 @@ CP.Form = CP.extend(CP.emptyFn, {
 		});
 
 	},
-	
+
 	clickBack: function (obj) {
 		var thisDiv = $(obj).closest('div');
 		setTimeout(function () {

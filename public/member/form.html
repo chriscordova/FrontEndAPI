@@ -26,15 +26,14 @@
 						<!--/ko-->
 						<div class="form-page table" data-bind="attr: { id: pageid }, visible: $root.showthispage ">
 							<h3 data-bind="html: pagetitle "></h3>
-							<!--ko foreach: $data.pageitems.sort(CP.sortBySortOrder) -->
+							<!--ko foreach: pageitems -->
 							<table class="table" data-bind="attr: { id: attributeid }">
 								<tbody>
 									<tr>
-										<!--ko with: $root.getAttributeData(attributeid)--><!--/ko-->
+										<!--ko with: $root.loadAttributeData(attributeid)--><!--/ko-->
 										<td data-bind="template: { name: $root.questiontype } "></td>
 									</tr>
 								</tbody>
-								
 							</table>
 							<!--ko with: $root.setAttributeValues($root.actualattributedata, $root.datatype)--><!--/ko-->
 							<!--ko with: $root.getHiddenRules(hiddenattributes)--><!--/ko-->
