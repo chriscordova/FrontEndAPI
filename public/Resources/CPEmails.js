@@ -68,7 +68,7 @@ CP.Emails = CP.extend(CP.emptyFn, {
 			jsEmail = {};
 		sEmailId = CP.getURLParam("emailid");
 		if (CP.isGuid(sEmailId)) {
-			$(data.emaildata).each(function (i, v) {
+			$(data.emailData).each(function (i, v) {
 				if (v.emailid == sEmailId) {
 					jsEmail = v;
 				}
