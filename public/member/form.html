@@ -21,7 +21,7 @@
 				<div class="col-md-9">
 					<img src="../../Resources/loading.gif" id="loading" />
 					<div id="dvForm">
-						<!--ko foreach: formdata.formData -->
+						<!--ko foreach: formdata -->
 						<!--ko with: $root.checkVisibility($index()) -->
 						<!--/ko-->
 						<div class="form-page table" data-bind="attr: { id: pageid }, visible: $root.showthispage ">
@@ -30,7 +30,7 @@
 							<table class="table" data-bind="attr: { id: attributeid }">
 								<tbody>
 									<tr>
-										<!--ko with: $root.loadAttributeData(attributeid)--><!--/ko-->
+										<!--ko with: $root.getAttributeData(attributeitemdata)--><!--/ko-->
 										<td data-bind="template: { name: $root.questiontype } "></td>
 									</tr>
 								</tbody>
@@ -41,7 +41,7 @@
 							<!--ko if: $index() !== 0 -->
 							<input type='button' class='btn btn-default' id='back' value='Back' />&nbsp;
 							<!--/ko-->
-							<!--ko template: $index() === ($parent.formdata.formData.length - 1) ? 'LastFormPage' : 'InnerFormPage'--><!--/ko-->
+							<!--ko template: $index() === ($parent.formdata.length - 1) ? 'LastFormPage' : 'InnerFormPage'--><!--/ko-->
 						</div>
 						<!--/ko-->
 					</div>

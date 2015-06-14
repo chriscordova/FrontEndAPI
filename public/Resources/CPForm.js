@@ -21,36 +21,6 @@ CP.Form = CP.extend(CP.emptyFn, {
 
 	},
 
-	onDemandObservable: function (callback, target) {
-		var _value = ko.observable();  //private observable
-
-		var result = ko.computed({
-			read: function () {
-				//if it has not been loaded, execute the supplied function
-				if (!result.loaded()) {
-					callback.call(target);
-				}
-				//always return the current value
-				return _value();
-			},
-			write: function (newValue) {
-				//indicate that the value is now loaded and set it
-				result.loaded(true);
-				_value(newValue);
-			},
-			deferEvaluation: true  //do not evaluate immediately when created
-		});
-
-		//expose the current state, which can be bound against
-		result.loaded = ko.observable();
-		//load it again
-		result.refresh = function () {
-			result.loaded(false);
-		};
-
-		return result;
-	},
-
 	FormViewModel: function (data, pageObj) {
 		var self = this;
 		self.formdata = ko.observableArray();
@@ -65,6 +35,38 @@ CP.Form = CP.extend(CP.emptyFn, {
 		self.datatype = ko.observable();
 		self.dropdown = ko.observable();
 		self.actualattributedata = ko.observableArray();
+		self.pageitems = ko.observableArray();
+
+		self.getAttributeData = function (items) {
+			var oAttribute, sTitle = '', sShortCode = '', sQuestionType = '', sInputType = '', bDropDown = false, bCurrency = false;
+			oAttribute = items;
+			bDropDown = pageObj.isDropDownQuestion(oAttribute.properties);
+			bCurrency = pageObj.isCurrencyQuestion(oAttribute.properties);
+			sTitle = oAttribute.questiontext;
+			sShortCode = oAttribute.shortcode;
+			sQuestionType = oAttribute.datatype;
+
+			self.attribute = oAttribute;
+			self.attributelistitems = oAttribute.listitems;
+			self.attributetitle = sTitle;
+			self.attributeshortcode = sShortCode;
+			self.datatype = sQuestionType;
+			self.dropdown = bDropDown;
+			self.usecurrency = bCurrency;
+
+			if (bDropDown) {
+				self.questiontype = 'QuestionType_DropDownQuestion';
+			}
+			else {
+				sInputType = CP.getControlFromDataType(sQuestionType, bDropDown);
+				self.questiontype = pageObj.getQuestionTemplate(sInputType);
+			}
+
+			var oAttributeData = oAttribute.attributedata[0];
+			if (CP.isNotNullOrEmpty(oAttributeData)) {
+				self.actualattributedata = oAttributeData;
+			}
+		};
 
 		self.getHiddenRules = function (e) {
 			ko.utils.arrayPushAll(pageObj.aHiddenRules, e);
@@ -75,67 +77,14 @@ CP.Form = CP.extend(CP.emptyFn, {
 		};
 
 		self.loadFormData = function (e) {
-			self.formdata = e;
+			self.formdata = e.formData.sort(CP.sortBySortOrder);
+			ko.utils.arrayForEach(self.formdata, function (item) {
+				self.pageitems = item.pageitems.sort(CP.sortBySortOrder);
+			});
 		};
 
 		self.checkVisibility = function (index) {
 			self.showthispage = index > 0 ? false : true;
-		};
-
-		self.loadAttributeData = function (id) {
-			self.attributeid = id;
-			self.getAttributeData(id);
-		};
-
-		self.getAttributeData = function (id) {
-			var oData = {
-				action: "GetAttributeDetails",
-				token: CP.apiTOKEN(),
-				attributeid: id,
-				postregistration: false
-			};
-
-			$.ajaxSetup({
-				async: false
-			});
-
-			var oAttribute, sTitle = '', sShortCode = '', sQuestionType = '', sInputType = '', bDropDown = false, bCurrency = false;
-
-			var req = $.post(CP.apiURL(), oData, self.fullattributedata);
-
-			req.done(function (response) {
-				oAttribute = response.Data.attribute[0];
-				bDropDown = pageObj.isDropDownQuestion(oAttribute.properties);
-				bCurrency = pageObj.isCurrencyQuestion(oAttribute.properties);
-				sTitle = oAttribute.questiontext;
-				sShortCode = oAttribute.shortcode;
-				sQuestionType = oAttribute.datatype;
-
-				self.attribute = oAttribute;
-				self.attributelistitems = oAttribute.listitems;
-				self.attributetitle = sTitle;
-				self.attributeshortcode = sShortCode;
-				self.datatype = sQuestionType;
-				self.dropdown = bDropDown;
-				self.usecurrency = bCurrency;
-
-				if (bDropDown) {
-					self.questiontype = 'QuestionType_DropDownQuestion';
-				}
-				else {
-					sInputType = CP.getControlFromDataType(sQuestionType, bDropDown);
-					self.questiontype = pageObj.getQuestionTemplate(sInputType);
-				}
-
-				var oAttributeData = oAttribute.attributedata[0];
-				if (CP.isNotNullOrEmpty(oAttributeData)) {
-					self.actualattributedata = oAttributeData;
-				}
-			});
-
-			$.ajaxSetup({
-				async: true
-			});
 		};
 
 		self.loadFormData(data);
@@ -203,6 +152,26 @@ CP.Form = CP.extend(CP.emptyFn, {
 		return sTemplate;
 	},
 
+	deferreds: [],
+
+	results: [],
+
+	processAttributeData: function (id, item, d) {
+		var pageObj = this;
+		var oData = {
+			action: "GetAttributeDetails",
+			token: CP.apiTOKEN(),
+			attributeid: id,
+			postregistration: false
+		};
+
+		$.post(CP.apiURL(), oData, function (result) {
+			item['attributeitemdata'] = result.Data.attribute[0];
+			pageObj.results.push(result);
+			d.resolve();
+		});
+	},
+
 	initForm: function () {
 		var pageObj = this;
 		
@@ -230,25 +199,39 @@ CP.Form = CP.extend(CP.emptyFn, {
 					}
 				});
 
+				var oForms = { "formData": arr[0].formpages };
 
-				var oForms = {
-					"formData": arr[0].formpages
-				};
-
-				var formVM = new pageObj.FormViewModel(oForms, pageObj);
-				ko.applyBindings(formVM);
+				$.each(oForms, function (i, v) {
+					$(v).each(function (i, v) {
+						var aPageItems = v.pageitems;
+						$(aPageItems).each(function (i, v) {
+							var dObject = new $.Deferred();
+							pageObj.deferreds.push(dObject);
+							pageObj.processAttributeData(v.attributeid, v, dObject);
+						});
+					});
+				});
+				
+				var formVM;
+				
+				$.when.apply($, pageObj.deferreds).done(function () {
+					// console.log(pageObj.results);
+					formVM = new pageObj.FormViewModel(oForms, pageObj);
+					ko.applyBindings(formVM);
+					pageObj.setHiddenRules(pageObj.aHiddenRules);
+				});
 			}
 		});
 
 		req.done(function () {
-			pageObj.setHiddenRules(pageObj.aHiddenRules);
+			
 		});
-				
+						
 		//Click Back
 		$(document).on('click', '#back', function () {
 			pageObj.clickBack(this);
 		});
-		
+				
 		//Click Save
 		$(document).on('click', '#save-attribute', function () {
 			pageObj.clickSave(this);
