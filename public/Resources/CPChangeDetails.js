@@ -19,6 +19,13 @@ CP.ChangeDetails = CP.extend(CP.emptyFn, {
 
 	initForm: function () {
 		var pageObj = this;
+		
+		var bRedirect = CP.getURLParam('redirect') == 'true' ? true : false;
+		if (bRedirect){
+			$('#incomplete-registration').show();
+			$('#incomplete-registration .message').html(CP.Message.incompleteRegistration);
+		}
+		
 		var oData4 = {
 			action: "GetPanelMemberDetails",
 			token: CP.apiTOKEN()
@@ -38,6 +45,14 @@ CP.ChangeDetails = CP.extend(CP.emptyFn, {
 	},
 
 	submit: function () {
+		
+		var aFields = $('#details *[required]');
+		var bValid = CP.checkRequiredFields(aFields);
+		if (!bValid) {
+			CP.setValidationBox('update', false, CP.Message.incompleteFields);
+			return false;
+		}
+		
 		var oData = $("#details").serializeArray();
 		oData.push({ name: 'token', value: CP.apiTOKEN() });
 

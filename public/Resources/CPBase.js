@@ -522,7 +522,9 @@ CP.Data = {
 };
 
 CP.Message = {
-
+	
+	incompleteRegistration: "Our records indicate you have incomplete registration details that are mandatory for all panel members. Please provide these details below.",
+	
 	incompleteFields: "There are incomplete fields.",
 
 	agreeToTerms: "You must agree to terms to continue.",

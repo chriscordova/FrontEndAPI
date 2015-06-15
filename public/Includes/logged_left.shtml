@@ -132,10 +132,20 @@ $(document).ready(function () {
 	$.post(CP.apiURL(), oData3, function (response) {
 		var obj = response;
 		if (obj.Success){
-			$('.pFullName').html(obj.Data.panelmemberdetails[0].fullname);
-			$('#pEmail').html(obj.Data.panelmemberdetails[0].emailaddress);
-			if (VerifyMobile){
-				var bHasUnverifiedMobile = obj.Data.panelmemberdetails[0].hasunverifiedmobile;
+			debugger;
+			var panelMemberDetails = obj.Data.panelmemberdetails[0];
+			$('.pFullName').html(panelMemberDetails.fullname);
+			$('#pEmail').html(panelMemberDetails.emailaddress);
+			
+			//Order of preference for Panel Member check is => 1. Agree To Terms 2. Has Incomplete Registration 3. Unverified Mobile Number
+			if (!panelMemberDetails.agreetoterms){
+				document.location.href = "agreetoterms.html";
+			}
+			else if (panelMemberDetails.hasincompleteregistration){
+				document.location.href = "changedetails.html?redirect=true";
+			}
+			else if (VerifyMobile){
+				var bHasUnverifiedMobile = panelMemberDetails.hasunverifiedmobile;
 				if (bHasUnverifiedMobile){
 					var oPath = $(location)[0].pathname;
 					var iVerifyPage = oPath.indexOf('smsverify');
