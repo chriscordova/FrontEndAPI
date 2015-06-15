@@ -355,6 +355,18 @@ var CP = {
 							oFormGroup.addClass('has-success');
 						}
 						break;
+					case 'checkbox':
+						var bChecked = oField.is(':checked');
+						if (!bChecked){
+							iCount++;
+							oFormGroup.removeClass('has-success');
+							oFormGroup.addClass('has-error');
+						}
+						else {
+							oFormGroup.removeClass('has-error');
+							oFormGroup.addClass('has-success');
+						}
+						break;
 					case 'number':
 						var bNumeric = $.isNumeric(sValue);
 						var sMessage;

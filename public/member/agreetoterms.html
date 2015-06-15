@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<title>CP Demo Panel - Contact Profiler</title>
+		<meta name="generator" content="Bootply" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://bootswatch.com/flatly/bootstrap.min.css">
+		<link rel="stylesheet" href="../resources/style.css">
+	</head>
+	<body class="overlay">
+		<header class="navbar navbar-default navbar-static-top" id="nav-header" role="banner"></header>
+		<!-- Begin Body -->
+		<div class="container">
+			<div class="row">
+				<div class="col-md-3" id="leftCol"></div>
+				<div class="col-md-9">
+					<h3>Changes have been made to the Terms and Conditions of this Website</h3>
+					<p>Before proceeding, we need you to confirm your acceptance of the Terms and Conditions for this site. Some changes have been
+						made to these Terms and Conditions. To view them, click the links below:</p>
+					<ul>
+						<li>Terms and Conditions</li>
+						<li>Privacy Policy</li>
+					</ul>
+					<p>Once you have reviewed these Terms and Conditions, you will need to indicate you agree to them by checking the box below
+						and pressing the submit button.</p>
+					<form class="form-horizontal" id="agreetoterms">
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Agree To Terms</label>
+							<div class="col-sm-10">
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" name="agreetoterms" value="true" required>
+									</label>
+								</div>
+							</div>
+						</div>
+					</form>
+					<p></p>
+					<input type="button" id="save" class="btn btn-default" value="Save" />
+					<br />
+					<br />
+					<div class="alert alert-danger" role="alert" id="save-fail" style="display: none;">
+						<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+						<span class="message"></span>
+					</div>
+					<div class="alert alert-success" role="alert" id="save-success" style="display: none;">
+						<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+						<span class="message"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<footer class="footer" style="  background: #2c3e50; height: 60px; margin-top: 60px;"></footer>
+		<!-- script references -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+		<!-- Latest compiled and minified JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+		<script src="../Resources/CPBase.js" type="text/javascript"></script>
+		<script src="../Resources/CPAgreeToTerms.js" type="text/javascript"></script>
+	</body>
+
+</html>
