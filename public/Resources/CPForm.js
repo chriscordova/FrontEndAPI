@@ -189,6 +189,7 @@ CP.Form = CP.extend(CP.emptyFn, {
 				var sFormId = CP.getURLParam("formid");
 				var aForms = obj.Data.formgroups;
 				var arr = null;
+				var formVM = null;
 				$.each(aForms, function (index, form) {
 					arr = $.grep(form.forms, function (n, i) {
 						return n.formid == sFormId;
@@ -206,25 +207,18 @@ CP.Form = CP.extend(CP.emptyFn, {
 						var aPageItems = v.pageitems;
 						$(aPageItems).each(function (i, v) {
 							var dObject = new $.Deferred();
-							pageObj.deferreds.push(dObject);
 							pageObj.processAttributeData(v.attributeid, v, dObject);
+							pageObj.deferreds.push(dObject);
 						});
 					});
 				});
 				
-				var formVM;
-				
 				$.when.apply($, pageObj.deferreds).done(function () {
-					// console.log(pageObj.results);
 					formVM = new pageObj.FormViewModel(oForms, pageObj);
 					ko.applyBindings(formVM);
 					pageObj.setHiddenRules(pageObj.aHiddenRules);
 				});
 			}
-		});
-
-		req.done(function () {
-			
 		});
 						
 		//Click Back
@@ -283,7 +277,6 @@ CP.Form = CP.extend(CP.emptyFn, {
 			}
 
 			pageObj.saveAttribute(sValues, sFormId, oAttributeId, bHidden);
-
 		});
 
 		setTimeout(function () {
