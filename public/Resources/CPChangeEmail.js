@@ -116,6 +116,8 @@ CP.ChangeEmail = CP.extend(CP.emptyFn, {
 			CP.setValidationBox('updatealtemail', false, CP.Message.emailAddressesDoNotMatch);
 			return false;
 		}
+		
+		return true;
 	},
 
 	changeAltEmail: function () {
