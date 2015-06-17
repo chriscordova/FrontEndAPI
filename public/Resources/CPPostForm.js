@@ -1,3 +1,4 @@
+/// <reference path="../../typings/knockout/knockout.d.ts"/>
 CP.PostForm = CP.extend(CP.emptyFn, {
 
 	constructor: function () {
@@ -6,18 +7,14 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 	},
 
 	aHiddenRules: [],
-
+	
 	personId: function () {
 		return CP.getURLParam('personid');
 	},
 
 	initPage: function () {
 		var pageObj = this;
-		$(document).ajaxComplete(function () {
-			pageObj.createHiddenRules(pageObj.aHiddenRules);
-		});
-
-		this.initForm();
+		pageObj.initForm();
 	},
 
 	initPageContent: function () {
@@ -26,6 +23,157 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 
 	setPageContent: function () {
 
+	},
+
+	FormViewModel: function (data, pageObj) {
+		var self = this;
+		self.formdata = ko.observableArray();
+		self.attribute = ko.observable();
+		self.attributelistitems = ko.observableArray();
+		self.fullattributedata = ko.observableArray();
+		self.attributetitle = ko.observable();
+		self.attributeshortcode = ko.observable();
+		self.questiontype = ko.observable();
+		self.showthispage = ko.observable();
+		self.usecurrency = ko.observable();
+		self.datatype = ko.observable();
+		self.dropdown = ko.observable();
+		self.actualattributedata = ko.observableArray();
+		self.pageitems = ko.observableArray();
+
+		self.getAttributeData = function (items) {
+			var oAttribute, sTitle = '', sShortCode = '', sQuestionType = '', sInputType = '', bDropDown = false, bCurrency = false;
+			oAttribute = items;
+			bDropDown = pageObj.isDropDownQuestion(oAttribute.properties);
+			bCurrency = pageObj.isCurrencyQuestion(oAttribute.properties);
+			sTitle = oAttribute.questiontext;
+			sShortCode = oAttribute.shortcode;
+			sQuestionType = oAttribute.datatype;
+
+			self.attribute = oAttribute;
+			self.attributelistitems = oAttribute.listitems;
+			self.attributetitle = sTitle;
+			self.attributeshortcode = sShortCode;
+			self.datatype = sQuestionType;
+			self.dropdown = bDropDown;
+			self.usecurrency = bCurrency;
+
+			if (bDropDown) {
+				self.questiontype = 'QuestionType_DropDownQuestion';
+			}
+			else {
+				sInputType = CP.getControlFromDataType(sQuestionType, bDropDown);
+				self.questiontype = pageObj.getQuestionTemplate(sInputType);
+			}
+
+			var oAttributeData = oAttribute.attributedata[0];
+			if (CP.isNotNullOrEmpty(oAttributeData)) {
+				self.actualattributedata = oAttributeData;
+			}
+		};
+
+		self.getHiddenRules = function (e) {
+			ko.utils.arrayPushAll(pageObj.aHiddenRules, e);
+		};
+
+		self.setAttributeValues = function (a, b) {
+			pageObj.setAttributeValues(a, b, self.dropdown);
+		};
+
+		self.loadFormData = function (e) {
+			self.formdata = e.formData.sort(CP.sortBySortOrder);
+			ko.utils.arrayForEach(self.formdata, function (item) {
+				self.pageitems = item.pageitems.sort(CP.sortBySortOrder);
+			});
+		};
+
+		self.checkVisibility = function (index) {
+			self.showthispage = index > 0 ? false : true;
+		};
+
+		self.loadFormData(data);
+		$('#dvForm').attr('formid', CP.getURLParam('formid'));
+
+	},
+
+	setHiddenRules: function (items) {
+		$.each(items, function (i, v) {
+			var attributeToHide = v.attributeid;
+			var choicesSelectedToShow = v.datachoices.split(',');
+			var thisAttribute = v.pageitemattributeid;
+			var ruleType = v.ruletype;
+			if (ruleType == 8) {
+				var inputs = $('#' + thisAttribute).find('input');
+				$('table#' + attributeToHide).hide();
+				$.each(inputs, function (i, v) {
+					if ($(v).is(':checked')) {
+						if ($.inArray($(v).val(), choicesSelectedToShow) >= 0) {
+							$('table#' + attributeToHide).show();
+						}
+					}
+				});
+
+				$('#' + thisAttribute).on('change', function () {
+					var inputs = $(this).find('input');
+					$.each(inputs, function (i, v) {
+						if ($(v).is(':checked')) {
+							if ($.inArray($(v).val(), choicesSelectedToShow) >= 0) {
+								$('#' + attributeToHide).show();
+							}
+							else {
+								$('#' + attributeToHide).hide();
+							}
+						}
+					});
+				});
+			}
+		});
+	},
+
+	getQuestionTemplate: function (inputType) {
+		var sTemplate = '';
+		switch (inputType) {
+			case "radio":
+				sTemplate = 'QuestionType_SingleChoiceQuestion';
+				break;
+			case "checkbox":
+				sTemplate = 'QuestionType_MultipleChoiceQuestion';
+				break;
+			case "number":
+			case "decimal":
+				sTemplate = 'QuestionType_NumericQuestion';
+				break;
+			case "text":
+				sTemplate = 'QuestionType_TextQuestion';
+				break;
+			case "date":
+				sTemplate = 'QuestionType_DateQuestion';
+				break;
+			default:
+				break;
+		}
+
+		return sTemplate;
+	},
+
+	deferreds: [],
+
+	results: [],
+
+	processAttributeData: function (id, item, d) {
+		var pageObj = this;
+		var oData = {
+			action: "GetAttributeDetails",
+			attributeid: id,
+			postregistration: true,
+			personid: pageObj.personId()
+		};
+
+		$.post(CP.apiURL(), oData, function (result) {
+			item['attributeitemdata'] = result.Data.attribute[0];
+			pageObj.results.push(result);
+			d.resolve();
+		});
 	},
 
 	initForm: function () {
@@ -38,185 +186,45 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 			personid: pageObj.personId()
 		};
 
-		$.post(CP.apiURL(), oData4, function (response) {
+		var req = $.post(CP.apiURL(), oData4, function (response) {
 			$('#loading').hide();
 			var obj = response;
 			if (obj.Success) {
-				pageObj.buildForm(obj.Data);
+
+				var arr = obj.Data.form;
+				var formVM = null;
+
+				var oForms = { "formData": arr[0].formpages };
+
+				$.each(oForms, function (i, v) {
+					$(v).each(function (i, v) {
+						var aPageItems = v.pageitems;
+						$(aPageItems).each(function (i, v) {
+							var dObject = new $.Deferred();
+							pageObj.processAttributeData(v.attributeid, v, dObject);
+							pageObj.deferreds.push(dObject);
+						});
+					});
+				});
+				
+				$.when.apply($, pageObj.deferreds).done(function () {
+					formVM = new pageObj.FormViewModel(oForms, pageObj);
+					ko.applyBindings(formVM);
+					pageObj.setHiddenRules(pageObj.aHiddenRules);
+				});
 			}
 		});
-		
+						
 		//Click Back
 		$(document).on('click', '#back', function () {
 			pageObj.clickBack(this);
 		});
-		
+				
 		//Click Save
 		$(document).on('click', '#save-attribute', function () {
 			pageObj.clickSave(this);
 		});
 
-	},
-
-	buildAttributeQuestion: function (QuestionText, DataType, DropDown, Currency, ListItems, ShortCode, AttributeId, PageId) {
-		var sBuild = "";
-		var sControl = "";
-		sBuild += "<table class='table' id='" + AttributeId + "'><tr><th colspan='2'>" + QuestionText + "</th></tr>";
-
-		if (DropDown) {
-			switch (DataType) {
-				case "Multiple Selection List":
-					sControl = "multiple";
-					break;
-				case "Single Selection List":
-					sControl = "";
-					break;
-				default:
-					break;
-			}
-
-			sBuild += "<tr><td><select " + sControl + " class='form-control'>";
-			sBuild += "<option value=''>Select...</option>";
-			$.each(ListItems, function (i, v) {
-				sBuild += "<option name='" + ShortCode + "' value='" + v.value + "'>" + v.name + "</option>";
-			});
-
-			sBuild += "</td></tr>";
-		}
-		else {
-			switch (DataType) {
-				case "Multiple Selection List":
-					sControl = "checkbox";
-					break;
-				case "Single Selection List":
-					sControl = "radio";
-					break;
-				case "Numeric":
-					sControl = "number";
-					break;
-				case "Decimal":
-					sControl = "number";
-					break;
-				case "Date and Time":
-					sControl = "date";
-					break;
-				case "Currency":
-					sControl = "number";
-					break;
-				case "Text":
-					sControl = "text";
-					break;
-				default:
-					break;
-			}
-
-			if (sControl == "text" || sControl == "number" || sControl == "date") {
-				sBuild += "<tr><td>";
-				if (Currency) {
-					sBuild += "$";
-				}
-				sBuild += "<input type='" + sControl + "' name='" + ShortCode + "'/>";
-				sBuild += "</td></tr>";
-			}
-			else {
-				$.each(ListItems, function (i, v) {
-					sBuild += "<tr><td>";
-					sBuild += "<label><input type='" + sControl + "' name='" + ShortCode + "' value='" + v.value + "'/> " + v.name + "</label>";
-					sBuild += "</td>";
-					if (v.value == "999") {
-						sBuild += "<td><input type='text' name='" + ShortCode + "' id='other'/></td>";
-					}
-					sBuild += "</tr>";
-				});
-			}
-
-		}
-
-		sBuild += '</table>';
-
-		var pageForm = $('#' + PageId);
-		var aTables = pageForm.find('table');
-		if (aTables.length > 0) {
-			var aLast = pageForm.find('table').last();
-			$(sBuild).insertAfter(aLast);
-		}
-		else {
-			$(sBuild).insertAfter('#' + PageId + ' h3');
-		}
-	},
-
-	buildForm: function (oData) {
-		var pageObj = this;
-		var sTable = "";
-		var sFormId = CP.getURLParam("formid");
-		$('#dvForm').attr('formid', sFormId);
-		var aFormGroups = oData.formgroups.sort(CP.sortBySortOrder);
-		$.each(aFormGroups, function (i, v) {
-			var aForms = v.forms.sort(CP.sortBySortOrder);
-			$.each(aForms, function (i, v) {
-				if (v.formid == sFormId) {
-					var aFormPages = v.formpages.sort(CP.sortBySortOrder);
-					var iPages = aFormPages.length;
-					$.each(aFormPages, function (i, v) {
-						var sPageId = v.pageid;
-						if (i > 0) {
-							sTable += "<div class='form-page table' style='display: none;' id='" + sPageId + "'>";
-						}
-						else {
-							sTable += "<div class='form-page table' id='" + sPageId + "'>";
-						}
-
-						sTable += "<h3>" + v.pagetitle + "</h3>";
-						var aPageItems = v.pageitems.sort(CP.sortBySortOrder);
-						var aPageItemsList = [];
-						$.each(aPageItems, function (i, v) {
-							//do hidden stuff here
-							var aHiddenItems = v.hiddenattributes;
-							if (aHiddenItems.length > 0) {
-								pageObj.aHiddenRules.push(aHiddenItems);
-							}
-
-							aPageItemsList.push(v);
-
-						});
-
-						deferredPost(0, aPageItemsList.length - 1);
-
-						function deferredPost(index, max) {
-							if (index < max) {
-								var o = pageObj.getAttribute(aPageItemsList[index].attributeid, sPageId);
-								if (o) {
-									setTimeout(function () {
-										deferredPost(index + 1, max);
-									}, 200);
-								}
-							} else {
-								setTimeout(function () {
-									return pageObj.getAttribute(aPageItemsList[index].attributeid, sPageId);
-								}, 200);
-
-							}
-						}
-
-						if (i != 0) {
-							sTable += "<input type='button' class='btn btn-default' id='back' value='Back'/>&nbsp;";
-						}
-
-						if (i == (iPages - 1)) {
-							sTable += "<input type='button' class='btn btn-default' id='save-attribute' value='Save and Finish'/>";
-						}
-						else {
-							sTable += "<input type='button' class='btn btn-default' id='save-attribute' value='Save and Next'/>&nbsp;";
-							sTable += "<input type='button' class='btn btn-default saveclose' id='save-attribute' value='Save and Close'/>";
-						}
-
-						sTable += "</div>";
-					});
-				}
-			});
-		});
-
-		$('#dvForm').append(sTable);
 	},
 
 	clickBack: function (obj) {
@@ -233,7 +241,6 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 	clickSave: function (obj) {
 		var pageObj = this;
 		//Save all attributes on the page
-		var bClose = $(obj).hasClass('saveclose');
 		var sFormId = $('#dvForm').attr('formid');
 		var thisDiv = $(obj).closest('div');
 		var aQuestions = thisDiv.find('table');
@@ -247,46 +254,7 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 
 			if (!bHidden) {
 				if (oInput.length > 0) {
-					var oInputType = $(oInput).attr('type');
-					switch (oInputType) {
-						case "text":
-						case "number":
-							sValues = $(oInput).val();
-							break;
-						case "date":
-							var dateValue = $(oInput).val();
-							var bMatch = dateValue.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-							if (bMatch) {
-								sValues = bMatch[3] + "/" + bMatch[2] + "/" + bMatch[1];
-							}
-							break;
-						case "radio":
-							$.each(oInput, function (i, v) {
-								var bChecked = $(v).is(':checked');
-								if (bChecked) {
-									var sVal = $(v).val();
-									sValues += sVal;
-									if (sVal == '999') {
-										var otherInput = $(v).closest('td').next().find('input');
-										if (otherInput.length > 0) {
-											var otherValue = otherInput.val();
-											sValues += '|' + otherValue;
-										}
-									}
-								}
-							});
-							break;
-						case "checkbox":
-							$.each(oInput, function (i, v) {
-								var bChecked = $(v).is(':checked');
-								if (bChecked) {
-									sValues += $(v).val() + "|";
-								}
-							});
-							break;
-						default:
-							break;
-					}
+					sValues = CP.getValuesFromInputType(oInput);
 				}
 				else if (oSelect.length > 0) {
 					var oSelectType = $(oSelect).attr('multiple');
@@ -302,9 +270,8 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 			}
 
 			pageObj.saveAttribute(sValues, sFormId, oAttributeId, bHidden);
-
 		});
-
+		
 		setTimeout(function () {
 			$('#save-success').hide();
 
@@ -318,85 +285,6 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 				nextDiv.show();
 			}
 		}, 3000);
-	},
-
-	createHiddenRules: function (aHiddenRules) {
-		$.each(aHiddenRules, function (i, items) {
-			$.each(items, function (i, v) {
-				var attributeToHide = v.attributeid;
-				var choicesSelectedToShow = v.datachoices.split(',');
-				var thisAttribute = v.pageitemattributeid;
-				var ruleType = v.ruletype;
-				if (ruleType == 8) {
-					var inputs = $('#' + thisAttribute).find('input');
-					$('#' + attributeToHide).hide();
-					$.each(inputs, function (i, v) {
-						if ($(v).is(':checked')) {
-							if ($.inArray($(v).val(), choicesSelectedToShow) >= 0) {
-								$('#' + attributeToHide).show();
-							}
-						}
-					});
-
-					$('#' + thisAttribute).on('change', function () {
-						var inputs = $(this).find('input');
-						$.each(inputs, function (i, v) {
-							if ($(v).is(':checked')) {
-								if ($.inArray($(v).val(), choicesSelectedToShow) >= 0) {
-									$('#' + attributeToHide).show();
-								}
-								else {
-									$('#' + attributeToHide).hide();
-								}
-							}
-						});
-					});
-				}
-			});
-		});
-	},
-
-	getAttribute: function (sAttributeId, sPageId) {
-		var pageObj = this;
-		var oData5 = {
-			action: "GetAttributeDetails",
-			token: CP.apiTOKEN(),
-			attributeid: sAttributeId,
-			postregistration: true,
-			personid: pageObj.personId()
-		};
-
-		return $.ajax({
-			type: "POST",
-			url: CP.apiURL(),
-			datatype: "json",
-			data: oData5,
-			success: function (response) {
-				var obj = response;
-				if (obj.Success) {
-					var sQuestionText = obj.Data.attribute[0].questiontext,
-						sDataType = obj.Data.attribute[0].datatype,
-						aListItems = obj.Data.attribute[0].listitems,
-						sShortCode = obj.Data.attribute[0].shortcode,
-						bDropDown = pageObj.isDropDownQuestion(obj.Data.attribute[0].properties),
-						bCurrency = pageObj.isCurrencyQuestion(obj.Data.attribute[0].properties);
-					pageObj.buildAttributeQuestion(sQuestionText, sDataType, bDropDown, bCurrency, aListItems, sShortCode, sAttributeId, sPageId);
-				}
-				else {
-					//No Attribute
-				}
-			},
-			complete: function (response) {
-				//Set attribute data if exists
-				var obj = response,
-					bDropDown = pageObj.isDropDownQuestion(obj.responseJSON.Data.attribute[0].properties),
-					oDataType = obj.responseJSON.Data.attribute[0].datatype,
-					oData = obj.responseJSON.Data.attribute[0].attributedata[0];
-				if (oData != null) {
-					pageObj.setAttributeValues(oData, oDataType, bDropDown);
-				}
-			}
-		});
 	},
 
 	isCurrencyQuestion: function (properties) {
@@ -429,9 +317,9 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 
 	saveAttribute: function (a, b, c, d) {
 		var pageObj = this;
+		
 		var oData6 = {
 			action: "SaveAttribute",
-			token: CP.apiTOKEN(),
 			values: a,
 			formid: b,
 			attributeid: c,
@@ -498,7 +386,7 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 						sOther = Data.other,
 						bSetOther = false;
 
-					if (iValue == '999') {
+					if (iValue === 999) {
 						bSetOther = true;
 					}
 
@@ -508,7 +396,7 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 						if (parseInt(value, 10) == parseInt(iValue, 10)) {
 							input.prop('checked', true);
 							if (bSetOther) {
-								var otherInput = input.closest('td').next().find('input');
+								var otherInput = input.parent().next();
 								$(otherInput).val(sOther);
 							}
 						}
@@ -528,13 +416,9 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 				break;
 			case "Date and Time":
 				var sNewDate = "",
-					aDate = [],
-					sDate = "",
-					oInput = oAttributeTable.find('input'),
+					oInput = oAttributeTable.find('input[type="date"]'),
 					sValue = Data.datadate;
-				sDate = sValue.slice(0, 10);
-				aDate = sDate.split("/");
-				sNewDate = aDate[2] + "-" + aDate[1] + "-" + aDate[0];
+				sNewDate = CP.formatDateForCP(sValue);
 				$(oInput).val(sNewDate);
 				break;
 			case "Decimal":
