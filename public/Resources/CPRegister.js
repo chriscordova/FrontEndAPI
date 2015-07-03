@@ -106,6 +106,14 @@ CP.Register = CP.extend(CP.emptyFn, {
 			CP.setValidationBox('register-part1', false, CP.Message.emailAddressesDoNotMatch);
 			return false;
 		}
+		
+		var sAltEmail1 = $('input[name="AlternateEmailAddress"]').val();
+		var sAltEmail2 = $('input[name="AlternateEmailAddress2"]').val();
+		var bAltConfirm = CP.checkConfirmFields(sAltEmail1, sAltEmail2);
+		if (!bAltConfirm) {
+			CP.setValidationBox('register-part1', false, CP.Message.altEmailAddressesDoNotMatch);
+			return false;
+		}
 
 		var bAgreeToTerms = $('input[name="AgreeToTerms"]').is(":checked");
 		if (!bAgreeToTerms) {
@@ -156,6 +164,10 @@ CP.Register = CP.extend(CP.emptyFn, {
 
 	populateStates: function (country) {
 		var oState = $('#State');
+		
+		//Clean it out first
+		oState.find('option').remove();
+		
 		oState.append($("<option></option>")
 			.attr("value", "")
 			.text("Choose one.."));
@@ -217,7 +229,7 @@ CP.Register = CP.extend(CP.emptyFn, {
 		var oData = $("#register").serializeArray();
 		oData.push({ name: "action", value: "CreateNewPanelMember" });
 		if (CP.isNotNullOrEmpty(sRespondentTypeId)) {
-			oData.push({ name: "campaigncode", value: sRespondentTypeId });
+			oData.push({ name: "CampaignCode", value: sRespondentTypeId });
 		}
 
 		$.post(CP.apiURL(), oData, function (response) {

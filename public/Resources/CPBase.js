@@ -198,13 +198,13 @@ var CP = {
     },
 
     apiURL: function () {
-        return "http://www.cpdemo.com.au/api.ashx";
-		//		return "http://localhost:64904/ContactProfiler/api.ashx";
+        // return "http://www.cpdemo.com.au/api.ashx";
+		return "http://localhost:58394/ContactProfiler/api.ashx";
     },
 
     apiOrigin: function () {
-        return "http://www.cpdemo.com.au/";
-		//		return "http://localhost:64904/ContactProfiler/";
+        // return "http://www.cpdemo.com.au/";
+		return "http://localhost:58394/ContactProfiler/";
     },
 
     apiTOKEN: function () {
@@ -542,7 +542,9 @@ CP.Message = {
 	agreeToTerms: "You must agree to terms to continue.",
 
 	emailAddressesDoNotMatch: "Email Addresses do not match.",
-
+	
+	altEmailAddressesDoNotMatch: "Alternate Email Addresses do not match.",
+	
 	lostPasswordEmail: "Lost password email has been sent",
 
 	emptyEmails: "No Panel Member Emails",
