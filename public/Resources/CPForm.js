@@ -359,6 +359,9 @@ CP.Form = CP.extend(CP.emptyFn, {
 				if (DropDown) {
 					var oSelect = oAttributeTable.find('select');
 					var sValue = Data.datatext;
+					if (CP.isNullOrEmpty(sValue)){
+						return;
+					}
 					aValues = sValue.split(';');
 					$.each(aValues, function (i, v) {
 						if (v != "" && v != null && v != undefined) {
@@ -369,6 +372,9 @@ CP.Form = CP.extend(CP.emptyFn, {
 				else {
 					var oInput = oAttributeTable.find('input');
 					var sValue = Data.datatext;
+					if (CP.isNullOrEmpty(sValue)){
+						return;
+					}
 					aValues = sValue.split(';');
 					var aInput = oAttributeTable.find('input');
 					$.each(aInput, function (i, v) {
@@ -387,6 +393,9 @@ CP.Form = CP.extend(CP.emptyFn, {
 				if (DropDown) {
 					var oSelect = oAttributeTable.find('select'),
 						iValue = Data.dataint2;
+					if (CP.isNullOrEmpty(iValue)){
+						return;
+					}
 					$(oSelect).val(iValue);
 				}
 				else {
@@ -416,28 +425,43 @@ CP.Form = CP.extend(CP.emptyFn, {
 			case "Numeric":
 				var oInput = oAttributeTable.find('input'),
 					sValue = Data.dataint;
+				if (CP.isNullOrEmpty(sValue)){
+					return;
+				}
 				$(oInput).val(sValue);
 				break;
 			case "Text":
 				var oInput = oAttributeTable.find('input'),
 					sValue = Data.datatext;
+				if (CP.isNullOrEmpty(sValue)){
+					return;
+				}
 				$(oInput).val(sValue);
 				break;
 			case "Date and Time":
 				var sNewDate = "",
 					oInput = oAttributeTable.find('input[type="date"]'),
 					sValue = Data.datadate;
+				if (CP.isNullOrEmpty(sValue)){
+					return;
+				}
 				sNewDate = CP.formatDateForCP(sValue);
 				$(oInput).val(sNewDate);
 				break;
 			case "Decimal":
 				var oInput = oAttributeTable.find('input'),
 					sValue = Data.datadecimal;
+				if (CP.isNullOrEmpty(sValue)){
+					return;
+				}
 				$(oInput).val(sValue);
 				break;
 			case "Currency":
 				var oInput = oAttributeTable.find('input'),
 					sValue = Data.datacurrency;
+				if (CP.isNullOrEmpty(sValue)){
+					return;
+				}
 				$(oInput).val(sValue);
 				break;
 			default:
