@@ -198,13 +198,13 @@ var CP = {
     },
 
     apiURL: function () {
-        // return "http://www.cpdemo.com.au/api.ashx";
-		return "http://localhost:58394/ContactProfiler/api.ashx";
+        return "http://www.cpdemo.com.au/api.ashx";
+		//return "http://localhost:58394/ContactProfiler/api.ashx";
     },
 
     apiOrigin: function () {
-        // return "http://www.cpdemo.com.au/";
-		return "http://localhost:58394/ContactProfiler/";
+        return "http://www.cpdemo.com.au/";
+		//return "http://localhost:58394/ContactProfiler/";
     },
 
     apiTOKEN: function () {

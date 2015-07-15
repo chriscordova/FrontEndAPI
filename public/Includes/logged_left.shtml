@@ -24,6 +24,10 @@
 		<div class="well well-sm col-xs-6 col-md-12">
 			<h3>Polls</h3>
 			<div id="dvPoll"></div>
+			<div class="alert alert-danger" role="alert" id="submit-poll-fail" style="display: none;">
+			  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+			  <span class="message"></span>
+			</div>
 			<input type="button" class="btn btn-default" style="display: none;" id="submit-poll" value="Submit Poll" />
 			<input type="button" class="btn btn-default" style="display: none;" id="findnew" value="Find New Poll" />
 		</div>

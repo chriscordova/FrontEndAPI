@@ -55,7 +55,7 @@ CP.LoggedLeft = CP.extend(CP.emptyFn, {
 		pageObj.setPanelMemberInfo(pageObj);
 
 		$('#findnew').on('click', function () {
-			pageObj.getPoll();
+			pageObj.getPoll(pageObj);
 		});
 
 		$('#submit-poll').on('click', function () {
@@ -81,7 +81,8 @@ CP.LoggedLeft = CP.extend(CP.emptyFn, {
 				}
 				else {
 					var sError = CP.Message.getError(obj);
-					$('#dvPoll').html(sError);
+					CP.setValidationBox('submit-poll', false, sError);
+					return false;
 				}
 			});
 		});

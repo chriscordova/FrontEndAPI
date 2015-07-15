@@ -44,7 +44,11 @@ CP.ChangeEmail = CP.extend(CP.emptyFn, {
 				}
 			}
 		});
-
+		
+		$('#removeAltEmailAddress').on('click', function(){
+			pageObj.removeAltEmail();
+		});
+		
 		$('#change-email').on('click', function () {
 			pageObj.changeEmail();
 		});
@@ -150,6 +154,33 @@ CP.ChangeEmail = CP.extend(CP.emptyFn, {
 				return false;
 			}
 		});
+	},
+	
+	removeAltEmail: function(){
+		var pageObj = this;
+		
+		//Confirm they want to delete
+		var bConfirm = confirm("Are you sure you want to remove your alternate email address record?");
+		if (!bConfirm){
+			return false;
+		}
+		
+		var oDeleteData = {
+			action: "RemoveAlternateEmailAddress",
+			token: CP.apiTOKEN()
+		};
+		
+		$.post(CP.apiURL(), oDeleteData, function(response){
+			var obj = response;
+			if (obj.Success){
+				window.location.reload(true);
+			}
+			else{
+				var sError = CP.Message.getError(obj);
+				CP.setValidationBox('removealtemailaddress', false, sError);
+			}
+		});
+		
 	}
 
 });
