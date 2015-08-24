@@ -8,6 +8,8 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 
 	aHiddenRules: [],
 	
+	aPageHidingRules: [],
+	
 	personId: function () {
 		return CP.getURLParam('personid');
 	},
@@ -198,6 +200,10 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 
 				$.each(oForms, function (i, v) {
 					$(v).each(function (i, v) {
+						var aPageRule = v.hiddenpagerules;
+						if (aPageRule.length > 0){
+							pageObj.aPageHidingRules.push(aPageRule);	
+						}
 						var aPageItems = v.pageitems;
 						$(aPageItems).each(function (i, v) {
 							var dObject = new $.Deferred();
@@ -232,8 +238,16 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 		setTimeout(function () {
 			var prevDiv = thisDiv.prev();
 			if (prevDiv) {
-				thisDiv.hide();
-				prevDiv.show();
+				var bSkip = prevDiv.attr('skip') == 'true';
+				if (bSkip){
+				   	thisDiv.hide();
+				   	prevDiv.prev().show();
+					prevDiv.removeAttr('skip');
+				}
+				else {
+					thisDiv.hide();
+				   	prevDiv.show();
+				}
 			}
 		}, 500);
 	},
@@ -244,6 +258,7 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 		var sFormId = $('#dvForm').attr('formid');
 		var thisDiv = $(obj).closest('div');
 		var aQuestions = thisDiv.find('table');
+		var bSkipNext = false;
 
 		$.each(aQuestions, function (i, v) {
 			var sValues = "";
@@ -270,6 +285,30 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 			}
 
 			pageObj.saveAttribute(sValues, sFormId, oAttributeId, bHidden);
+			
+			//Need to add Page Hiding Rules Logic Here....
+			
+			var nextPageId = thisDiv.next().attr('id');
+			var aMatchingAttribute = $.grep(pageObj.aPageHidingRules[0], function(e){ return e.attributeid == oAttributeId});
+			if (aMatchingAttribute.length){
+				var sRuleValue = aMatchingAttribute[0].datachoices;
+				if (CP.isNotNullOrEmpty(sRuleValue)){
+					var aValues = sRuleValue.split(',');
+					if (aValues.length){
+						var aFormValues = sValues.split('|');
+						$(aValues).each(function(i,v){
+							var sVal = v.toString();
+							var iExists = $.inArray(sVal, aFormValues);
+							if (iExists >= 0){
+								if (aMatchingAttribute[0].pageid == nextPageId){
+									thisDiv = thisDiv.next();
+									bSkipNext = true;
+								}
+							}
+						});
+					}
+				}
+			}
 		});
 		
 		setTimeout(function () {
@@ -281,7 +320,14 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 				return false;
 			}
 			else {
-				thisDiv.hide();
+				if (bSkipNext){
+				  	thisDiv.prev().hide();
+					thisDiv.attr('skip','true');	
+				}
+				else{
+					thisDiv.hide();
+				}
+				
 				nextDiv.show();
 			}
 		}, 3000);
