@@ -236,20 +236,66 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 	clickBack: function (obj) {
 		var thisDiv = $(obj).closest('div');
 		setTimeout(function () {
-			var prevDiv = thisDiv.prev();
-			if (prevDiv) {
-				var bSkip = prevDiv.attr('skip') == 'true';
-				if (bSkip){
-				   	thisDiv.hide();
-				   	prevDiv.prev().show();
-					prevDiv.removeAttr('skip');
+			
+			//Now loop through .prev() until we find a DIV without the attribute 'skip="true"'
+			//Need to also remove the attribute 'skip'.
+			
+			var oPrevToShow;
+			var aPrevPages = $(thisDiv).prevAll();
+			aPrevPages.get().reverse();
+			
+			$(aPrevPages).each(function(i,e){
+				var oElement = $(e);
+				var oSkipAttr = oElement.attr('skip');
+				if (CP.isNotNullOrEmpty(oSkipAttr)){
+					oElement.removeAttr('skip');
 				}
-				else {
-					thisDiv.hide();
-				   	prevDiv.show();
+				else{
+					oPrevToShow = oElement;
+					return false;
+				}
+			});
+			
+			thisDiv.hide();
+			oPrevToShow.show();
+			
+		}, 500);
+	},
+	
+	saveHiddenPages: function(element) {
+		var pageObj = this;
+		
+		//Save all attributes on the page
+		var sFormId = $('#dvForm').attr('formid');
+		var thisDiv = $(element);
+		var aQuestions = thisDiv.find('table');
+
+		$.each(aQuestions, function (i, v) {
+			var sValues = "";
+			var oAttributeId = v.id;
+			var bHidden = !$(v).is(':visible');
+			var oInput = $(v).find('input');
+			var oSelect = $(v).find('select');
+
+			if (!bHidden) {
+				if (oInput.length > 0) {
+					sValues = CP.getValuesFromInputType(oInput);
+				}
+				else if (oSelect.length > 0) {
+					var oSelectType = $(oSelect).attr('multiple');
+					if (oSelectType) {
+						$(oSelect + ' :selected').each(function (i, selected) {
+							sValues += $(selected).val();
+						});
+					}
+					else {
+						sValues = $(oSelect).val();
+					}
 				}
 			}
-		}, 500);
+
+			pageObj.saveAttribute(sValues, sFormId, oAttributeId, bHidden);
+		});
 	},
 
 	clickSave: function (obj) {
@@ -258,7 +304,7 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 		var sFormId = $('#dvForm').attr('formid');
 		var thisDiv = $(obj).closest('div');
 		var aQuestions = thisDiv.find('table');
-		var bSkipNext = false;
+		var aNextPages = $(thisDiv).nextAll();
 
 		$.each(aQuestions, function (i, v) {
 			var sValues = "";
@@ -286,51 +332,79 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 
 			pageObj.saveAttribute(sValues, sFormId, oAttributeId, bHidden);
 			
-			//Need to add Page Hiding Rules Logic Here....
+			//Multiple page hide:
+			//Need to set 'skip="true"' to any page that is going to be hidden on NEXT.
+			//Once set all skip to any pages, we need to find the next page that does NOT have attribute and show that/hide the rest.
 			
-			var nextPageId = thisDiv.next().attr('id');
-			var aMatchingAttribute = $.grep(pageObj.aPageHidingRules[0], function(e){ return e.attributeid == oAttributeId});
-			if (aMatchingAttribute.length){
-				var sRuleValue = aMatchingAttribute[0].datachoices;
-				if (CP.isNotNullOrEmpty(sRuleValue)){
-					var aValues = sRuleValue.split(',');
-					if (aValues.length){
-						var aFormValues = sValues.split('|');
-						$(aValues).each(function(i,v){
-							var sVal = v.toString();
-							var iExists = $.inArray(sVal, aFormValues);
-							if (iExists >= 0){
-								if (aMatchingAttribute[0].pageid == nextPageId){
-									thisDiv = thisDiv.next();
-									bSkipNext = true;
+			$(aNextPages).each(function(i,el){
+				var oElement = $(el);
+				var gPageId = oElement.attr('id');
+				if (CP.isNotNullOrEmpty(gPageId)){
+					var aRules = pageObj.aPageHidingRules;
+					$(aRules).each(function(i,rules){
+						var aMatchingAttr = $.grep(rules, function(e){ return e.attributeid == oAttributeId });
+						if (aMatchingAttr.length > 0){
+							$(aMatchingAttr).each(function(i,att){
+								var sRuleValue = att.datachoices;
+								if (CP.isNotNullOrEmpty(sRuleValue)){
+									var aValues = sRuleValue.split(',');
+									if (aValues.length){
+										var aFormValues = sValues.split('|');
+										$(aValues).each(function(i,v){
+											var sVal = v.toString();
+											var iExists = $.inArray(sVal, aFormValues);
+											if (iExists >= 0){
+												if (att.pageid == gPageId){
+													oElement.attr('skip', 'true');
+													//need to ..saveAttribute for these pages.
+													pageObj.saveHiddenPages(oElement);
+												}
+											}
+										});
+									}
 								}
-							}
-						});
-					}
+							});
+						}
+					});
 				}
-			}
+			});
 		});
 		
 		setTimeout(function () {
 			$('#save-success').hide();
-
+			
+			//Check to see if we are clicking to the end, if so, redirect to main page
 			var nextDiv = thisDiv.next();
 			if (nextDiv.length == 0) {
 				document.location.href = "index.html";
 				return false;
 			}
-			else {
-				if (bSkipNext){
-				  	thisDiv.prev().hide();
-					thisDiv.attr('skip','true');	
-				}
-				else{
-					thisDiv.hide();
-				}
-				
-				nextDiv.show();
+			
+			//Find the next DIV that does NOT have the 'skip="true"' attribute
+			var iCount = 0;
+			var oNextToShow = $.grep(aNextPages, function(e){
+					if (CP.isNullOrEmpty(e.attributes.skip)){
+						if (iCount == 0){
+							iCount++;
+							return true;
+						}
+					}
+				});
+			
+			//Hide this page
+			$(thisDiv).hide();
+			
+			//Show the found DIV that needs to be shown/If none shown, redirect to main page
+			if (CP.isNullOrEmpty(oNextToShow)){
+				document.location.href = "index.html";
+				return false;
 			}
+			else{
+				$(oNextToShow).show();
+			}
+			
 		}, 3000);
+		
 	},
 
 	isCurrencyQuestion: function (properties) {
