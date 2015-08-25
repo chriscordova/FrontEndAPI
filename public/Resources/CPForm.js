@@ -343,34 +343,20 @@ CP.Form = CP.extend(CP.emptyFn, {
 			//Multiple page hide:
 			//Need to set 'skip="true"' to any page that is going to be hidden on NEXT.
 			//Once set all skip to any pages, we need to find the next page that does NOT have attribute and show that/hide the rest.
+			//Currently Working on: Adding rule types switch
 			
 			$(aNextPages).each(function(i,el){
 				var oElement = $(el);
 				var gPageId = oElement.attr('id');
 				if (CP.isNotNullOrEmpty(gPageId)){
 					var aRules = pageObj.aPageHidingRules;
+					//All page hiding rules attached to form
 					$(aRules).each(function(i,rules){
 						var aMatchingAttr = $.grep(rules, function(e){ return e.attributeid == oAttributeId });
 						if (aMatchingAttr.length > 0){
+							//All page hiding rules that refer to the attribute
 							$(aMatchingAttr).each(function(i,att){
-								var sRuleValue = att.datachoices;
-								if (CP.isNotNullOrEmpty(sRuleValue)){
-									var aValues = sRuleValue.split(',');
-									if (aValues.length){
-										var aFormValues = sValues.split('|');
-										$(aValues).each(function(i,v){
-											var sVal = v.toString();
-											var iExists = $.inArray(sVal, aFormValues);
-											if (iExists >= 0){
-												if (att.pageid == gPageId){
-													oElement.attr('skip', 'true');
-													//need to ..saveAttribute for these pages.
-													pageObj.saveHiddenPages(oElement);
-												}
-											}
-										});
-									}
-								}
+								pageObj.processPageHidingRules(att, oElement, gPageId, sValues);
 							});
 						}
 					});
@@ -420,7 +406,57 @@ CP.Form = CP.extend(CP.emptyFn, {
 		}, 3000);
 		
 	},
-
+	
+	processPageHidingRules: function(attributeRule, element, pageId, values){
+		var pageObj = this;
+		
+		var sRuleValue = attributeRule.datachoices;
+		var iRuleType = attributeRule.ruletype;
+		if (CP.isNotNullOrEmpty(sRuleValue)){
+			var aValues = sRuleValue.split(',');
+			if (aValues.length){
+				var aFormValues = values.split('|');
+				switch (iRuleType){
+					case 8: //Hide page if any of the choices are selected
+						$(aValues).each(function(i,v){
+							var sVal = v.toString();
+							var iExists = $.inArray(sVal, aFormValues);
+							if (iExists >= 0){
+								if (attributeRule.pageid == pageId){
+									element.attr('skip', 'true');
+									pageObj.saveHiddenPages(element);
+								}
+							}
+						});
+						break;
+					case 9: //Hide page if any of the choices are NOT selected
+						var iCount = 0;
+						$(aValues).each(function(i,v){
+							var sVal = v.toString();
+							var iExists = $.inArray(sVal, aFormValues);
+							if (iExists >= 0){
+								if (attributeRule.pageid == pageId){
+									iCount++;
+								}
+							}
+						});
+						
+						if (attributeRule.pageid == pageId){
+							if (iCount == 0){
+								element.attr('skip', 'true');
+								pageObj.saveHiddenPages(element);
+							}	
+						}
+						break;
+					default:
+						break;
+				}
+				
+				
+			}
+		}
+	},
+	
 	isCurrencyQuestion: function (properties) {
 		var bCurrency = false;
 		$.each(properties, function (i, v) {
