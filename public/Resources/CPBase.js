@@ -203,7 +203,7 @@ var CP = {
 			return "http://localhost:58394/ContactProfiler/api.ashx"; 
 		}
 		else {
-			return CP.apiOrigin + "api.ashx";
+			return CP.apiOrigin() + "api.ashx";
 		}
     },
 
