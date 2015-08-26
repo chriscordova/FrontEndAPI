@@ -196,15 +196,25 @@ var CP = {
     isOdd: function (n) {
         return CP.isNumber(n) && (Math.abs(n) % 2 == 1);
     },
-
+	
     apiURL: function () {
-        // return "http://www.cpdemo.com.au/api.ashx";
-		return "http://localhost:58394/ContactProfiler/api.ashx";
+		var url = window.location.toString().slice(7);
+		if (url.slice(0, 9) == "localhost"){
+			return "http://localhost:58394/ContactProfiler/api.ashx"; 
+		}
+		else {
+			return CP.apiOrigin + "api.ashx";
+		}
     },
 
     apiOrigin: function () {
-        // return "http://www.cpdemo.com.au/";
-		return "http://localhost:58394/ContactProfiler/";
+		var url = window.location.toString().slice(7);
+		if (url.slice(0, 9) == "localhost"){
+			return "http://localhost:58394/ContactProfiler/"; 
+		}
+		else {
+			return "http://www.cpdemo.com.au/";
+		}
     },
 
     apiTOKEN: function () {
