@@ -198,13 +198,13 @@ var CP = {
     },
 
     apiURL: function () {
-        return "http://www.cpdemo.com.au/api.ashx";
-		// return "http://localhost:58394/ContactProfiler/api.ashx";
+        // return "http://www.cpdemo.com.au/api.ashx";
+		return "http://localhost:58394/ContactProfiler/api.ashx";
     },
 
     apiOrigin: function () {
-        return "http://www.cpdemo.com.au/";
-		// return "http://localhost:58394/ContactProfiler/";
+        // return "http://www.cpdemo.com.au/";
+		return "http://localhost:58394/ContactProfiler/";
     },
 
     apiTOKEN: function () {
@@ -259,7 +259,22 @@ var CP = {
 		var scrollPos = $(oSelectorMessage).offset().top;
 		$(window).scrollTop(scrollPos);
 	},
-
+	
+	formValidation: function(attributeid, noError){
+		var element = $('#' + attributeid);
+		var questionTitle = element.find('h4');
+		switch (noError){
+			case true:
+				questionTitle.removeClass('form-error');
+				break;
+			case false:
+				questionTitle.addClass('form-error');
+				break;
+			default:
+				break;
+		}
+	},
+	
     checkConfirmFields: function (a, b) {
         return a == b;
     },

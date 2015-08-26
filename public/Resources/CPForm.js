@@ -157,7 +157,9 @@ CP.Form = CP.extend(CP.emptyFn, {
 	deferreds: [],
 
 	results: [],
-
+	
+	bError: false,
+	
 	processAttributeData: function (id, item, d) {
 		var pageObj = this;
 		var oData = {
@@ -240,6 +242,7 @@ CP.Form = CP.extend(CP.emptyFn, {
 	},
 
 	clickBack: function (obj) {
+		$('#save-fail').hide();
 		var thisDiv = $(obj).closest('div');
 		setTimeout(function () {
 			
@@ -307,6 +310,11 @@ CP.Form = CP.extend(CP.emptyFn, {
 	clickSave: function (obj) {
 		var pageObj = this;
 		
+		pageObj.bError = false;
+		
+		$('#save-fail').hide();
+		$('#save-success').hide();
+		
 		//Save all attributes on the page
 		var bClose = $(obj).hasClass('saveclose');
 		var sFormId = $('#dvForm').attr('formid');
@@ -366,42 +374,46 @@ CP.Form = CP.extend(CP.emptyFn, {
 		});
 
 		setTimeout(function () {
-			$('#save-success').hide();
-			//Pressed Save and Close
-			if (bClose) {
-				document.location.href = "profileform.html";
-				return false;
-			}
 			
-			//Check to see if we are clicking to the end, if so, redirect to main page
-			var nextDiv = thisDiv.next();
-			if (nextDiv.length == 0) {
-				document.location.href = "profileform.html";
-				return false;
-			}
-			
-			//Find the next DIV that does NOT have the 'skip="true"' attribute
-			var iCount = 0;
-			var oNextToShow = $.grep(aNextPages, function(e){
-					if (CP.isNullOrEmpty(e.attributes.skip)){
-						if (iCount == 0){
-							iCount++;
-							return true;
+			if (!pageObj.bError){
+				$('#save-success').hide();
+				//Pressed Save and Close
+				if (bClose) {
+					document.location.href = "profileform.html";
+					return false;
+				}
+				
+				//Check to see if we are clicking to the end, if so, redirect to main page
+				var nextDiv = thisDiv.next();
+				if (nextDiv.length == 0) {
+					document.location.href = "profileform.html";
+					return false;
+				}
+				
+				//Find the next DIV that does NOT have the 'skip="true"' attribute
+				var iCount = 0;
+				var oNextToShow = $.grep(aNextPages, function(e){
+						if (CP.isNullOrEmpty(e.attributes.skip)){
+							if (iCount == 0){
+								iCount++;
+								return true;
+							}
 						}
-					}
-				});
-			
-			//Hide this page
-			$(thisDiv).hide();
-			
-			//Show the found DIV that needs to be shown/If none shown, redirect to main page
-			if (CP.isNullOrEmpty(oNextToShow)){
-				document.location.href = "profileform.html";
-				return false;
+					});
+				
+				//Hide this page
+				$(thisDiv).hide();
+				
+				//Show the found DIV that needs to be shown/If none shown, redirect to main page
+				if (CP.isNullOrEmpty(oNextToShow)){
+					document.location.href = "profileform.html";
+					return false;
+				}
+				else{
+					$(oNextToShow).show();
+				}
 			}
-			else{
-				$(oNextToShow).show();
-			}
+			
 			
 		}, 3000);
 		
@@ -486,6 +498,8 @@ CP.Form = CP.extend(CP.emptyFn, {
 	},
 
 	saveAttribute: function (a, b, c, d) {
+		var pageObj = this;
+		
 		var oData6 = {
 			action: "SaveAttribute",
 			token: CP.apiTOKEN(),
@@ -499,11 +513,16 @@ CP.Form = CP.extend(CP.emptyFn, {
 		$.post(CP.apiURL(), oData6, function (response) {
 			var obj = response;
 			if (obj.Success) {
-				CP.setValidationBox('save', true, 'Response saved.');
+				CP.formValidation(c, true);	
+				if (!$('#save-fail').is(':visible')){
+					CP.setValidationBox('save', true, 'Response saved.');
+				}
 			}
 			else {
 				var sError = CP.Message.getError(obj);
 				CP.setValidationBox('save', false, sError);
+				CP.formValidation(c, false);
+				pageObj.bError = true;
 				return false;
 			}
 		});

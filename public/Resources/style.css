@@ -10,6 +10,10 @@
 	color: #66FF00;
 }
 
+.form-error {
+  color: #e74c3c;
+}
+
 /*.overlay {
 	  background: url("http://www.aveva.com/Images/ajax-loader.gif") no-repeat scroll center center;
   z-index: 9999999;
