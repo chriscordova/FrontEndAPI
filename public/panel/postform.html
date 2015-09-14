@@ -91,12 +91,12 @@
 		</script>
 		<script type="text/html" id="QuestionType_TextQuestion">
 			<h4 data-bind="text: $root.attributetitle"></h4>
-				<input type="text" data-bind = "attr: { name: $root.attributeshortcode }"/>
+				<input type="text" class="form-control" data-bind = "attr: { name: $root.attributeshortcode }"/>
 		</script>
 		<script type="text/html" id="QuestionType_NumericQuestion">
 			<h4 data-bind="text: $root.attributetitle"></h4>
 				<!--ko if: $root.usecurrency-->$<!--/ko-->
-				<input type="number" data-bind = "attr: { name: $root.attributeshortcode }"/>
+				<input type="number" class="form-control" data-bind = "attr: { name: $root.attributeshortcode }"/>
 		</script>
 		<script type="text/html" id="QuestionType_DateQuestion">
 			<h4 data-bind="text: $root.attributetitle"></h4>
