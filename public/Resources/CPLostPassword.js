@@ -21,9 +21,21 @@ CP.LostPassword = CP.extend(CP.emptyFn, {
 	initForm: function () {
 		var pageObj = this;
 		$('#sendemail').on('click', function () {
-			pageObj.submit();
+			pageObj.validateForm();
 		});
 
+	},
+	
+	validateForm: function(){
+		var pageObj = this;
+		var aRequired = $('#lost-password *[required]');
+		var bValid = CP.checkRequiredFields(aRequired);
+		if (!bValid){
+			CP.setValidationBox('reset-password', false, CP.Message.incompleteFields)
+			return false;
+		}
+		
+		pageObj.submit();
 	},
 
 	submit: function () {
