@@ -52,6 +52,11 @@ CP.ChangePassword = CP.extend(CP.emptyFn, {
 		if (!pageObj.validatePassword(sNewPassword, sConfirmPassword)){
 			return false;
 		}
+		
+		if (!CP.passwordVal(sNewPassword)){
+			CP.setValidationBox('updatepassword', false, 'Password contains invalid characters or is not required min length of 6 characters.');
+			return false;
+		}
 
 		var oData = {
 			action: "ChangePanelMemberPassword",

@@ -529,6 +529,12 @@ var CP = {
 		}
 
 		return sControl;
+	},
+	
+	passwordVal: function(sText){
+		var bHasBlank = sText.indexOf(" ") >= 0;
+		var bValidLength = sText.length >= 6;
+		return !bHasBlank && bValidLength;
 	}
 };
 

@@ -74,6 +74,11 @@ CP.Verify = CP.extend(CP.emptyFn, {
 			return false;
 		}
 		
+		if (!CP.passwordVal(sPassword)){
+			CP.setValidationBox('verify', false, 'Password contains invalid characters or is not required min length of 6 characters.');
+			return false;
+		}
+		
 		var oData1 = {
 			action: "VerifyAccount",
 			password: sPassword,
@@ -87,9 +92,24 @@ CP.Verify = CP.extend(CP.emptyFn, {
 			var bSuccess = obj.Success;
 			if (bSuccess) {
 				var sAPIToken = obj.Data.token;
-				if (CP.isNotNullOrEmpty(sAPIToken)) {
-					localStorage.setItem("TOKEN", sAPIToken);
-					document.location.href = '../member/index.html';
+				var sRole = obj.Data.role;
+				if (CP.isNotNullOrEmpty(sRole)){
+					switch (sRole)
+					{
+						case "Administrator":
+						case "Consultant":
+							document.location.href = '../panel';
+							break;
+						case "Contact":
+						case "External User":
+							if (CP.isNotNullOrEmpty(sAPIToken)) {
+								localStorage.setItem("TOKEN", sAPIToken);
+								document.location.href = '../member/index.html';
+							}
+							break;
+						default:
+							break;
+					}
 				}
 			}
 			else {
