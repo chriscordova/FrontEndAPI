@@ -27,50 +27,50 @@
 			<form id="register" class="form-horizontal">
 				<div id="part1">
 					<div class="form-group">
-						<label for="inputTitle" class="col-sm-2 control-label">Title</label>
-						<div class="col-sm-10">
+						<label for="inputTitle" class="col-sm-3 control-label">Title</label>
+						<div class="col-sm-9">
 						  <input type="text" class="form-control" name="Title" required/>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputFirstName" class="col-sm-2 control-label">First Name</label>
-						<div class="col-sm-10">
+						<label for="inputFirstName" class="col-sm-3 control-label">First Name</label>
+						<div class="col-sm-9">
 						  <input type="text" class="form-control" name="FirstName" required>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputLastName" class="col-sm-2 control-label">Last Name</label>
-						<div class="col-sm-10">
+						<label for="inputLastName" class="col-sm-3 control-label">Last Name</label>
+						<div class="col-sm-9">
 						  <input type="text" class="form-control" name="LastName" required>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputEmail" class="col-sm-2 control-label">Email Address</label>
-						<div class="col-sm-10">
+						<label for="inputEmail" class="col-sm-3 control-label">Email Address</label>
+						<div class="col-sm-9">
 						  <input type="email" class="form-control" name="EmailAddress" required>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputEmail" class="col-sm-2 control-label">Confirm Email Address</label>
-						<div class="col-sm-10">
+						<label for="inputEmail" class="col-sm-3 control-label">Confirm Email Address</label>
+						<div class="col-sm-9">
 						  <input type="email" class="form-control" name="EmailAddress2" required>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputAltEmail" class="col-sm-2 control-label">Alternate Email Address</label>
-						<div class="col-sm-10">
+						<label for="inputAltEmail" class="col-sm-3 control-label">Alternate Email Address</label>
+						<div class="col-sm-9">
 						  <input type="email" class="form-control" name="AlternateEmailAddress">
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputAltEmail" class="col-sm-2 control-label">Confirm Alternate Email Address</label>
-						<div class="col-sm-10">
+						<label for="inputAltEmail" class="col-sm-3 control-label">Confirm Alternate Email Address</label>
+						<div class="col-sm-9">
 						  <input type="email" class="form-control" name="AlternateEmailAddress2">
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputHTML" class="col-sm-2 control-label">Email Format</label>
-						<div class="col-sm-10">
+						<label for="inputHTML" class="col-sm-3 control-label">Email Format</label>
+						<div class="col-sm-9">
 							<div class="radio" name="UseHTMLEmails" required>
 							  <label>
 								<input type="radio" name="UseHTMLEmails" id="optionsRadios1" value="true">
@@ -85,8 +85,8 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputMember" class="col-sm-2 control-label">Member Type</label>
-						<div class="col-sm-10">
+						<label for="inputMember" class="col-sm-3 control-label">Member Type</label>
+						<div class="col-sm-9">
 							<select name="MemberType" id="MemberType" class="form-control" required>
 								<option value="">Choose One...</option>
 								<option value="1">Type 1</option>
@@ -98,8 +98,8 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputGender" class="col-sm-2 control-label">Gender</label>
-						<div class="col-sm-10">
+						<label for="inputGender" class="col-sm-3 control-label">Gender</label>
+						<div class="col-sm-9">
 							<div class="radio" required>
 							  <label>
 								<input type="radio" name="Gender" id="optionsRadios1" value="Male">
@@ -114,14 +114,14 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputEmail" class="col-sm-2 control-label">DOB</label>
-						<div class="col-sm-10">
+						<label for="inputEmail" class="col-sm-3 control-label">Date of Birth</label>
+						<div class="col-sm-9">
 						  <input type="date" class="form-control" name="BirthDate" required>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputCountry" class="col-sm-2 control-label">Country</label>
-						<div class="col-sm-10">
+						<label for="inputCountry" class="col-sm-3 control-label">Country</label>
+						<div class="col-sm-9">
 							<select name="Country" id="Country" class="form-control" required>
 								<option value="">Choose One...</option>
 								<option value="Australia">Australia</option>
@@ -130,11 +130,12 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputAgree" class="col-sm-2 control-label">Agree To Terms</label>
-						<div class="col-sm-10">
+						<label for="inputAgree" class="col-sm-3 control-label">Terms and Conditions</label>
+						<div class="col-sm-9">
 							<div class="checkbox">
 							  <label>
 								<input type="checkbox" name="AgreeToTerms" value="">
+								I have read and agree to the <a href="">Terms and Conditions</a> and <a href="">Privacy Policy</a>
 							  </label>
 							</div>
 						</div>
@@ -148,39 +149,39 @@
 				</div><!--End of Part 1-->
 				<div id="part2" style="display: none;">
 					<div class="form-group">
-						<label for="inputTitle" class="col-sm-2 control-label">Address Line 1</label>
-						<div class="col-sm-10">
+						<label for="inputTitle" class="col-sm-3 control-label">Address Line 1</label>
+						<div class="col-sm-9">
 						  <input type="text" class="form-control" name="Address1" required>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputTitle" class="col-sm-2 control-label">Address Line 2</label>
-						<div class="col-sm-10">
+						<label for="inputTitle" class="col-sm-3 control-label">Address Line 2</label>
+						<div class="col-sm-9">
 						  <input type="text" class="form-control" name="Address2">
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputTitle" class="col-sm-2 control-label">City</label>
-						<div class="col-sm-10">
+						<label for="inputTitle" class="col-sm-3 control-label">City</label>
+						<div class="col-sm-9">
 						  <input type="text" class="form-control" name="City" required>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputTitle" class="col-sm-2 control-label">State</label>
-						<div class="col-sm-10">
+						<label for="inputTitle" class="col-sm-3 control-label">State</label>
+						<div class="col-sm-9">
 						  <select name="State" id="State" class="form-control" required>
 						  </select>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputTitle" class="col-sm-2 control-label">Postcode</label>
-						<div class="col-sm-10">
+						<label for="inputTitle" class="col-sm-3 control-label">Postcode</label>
+						<div class="col-sm-9">
 						  <input type="text" class="form-control" name="PostalCode" required>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputTitle" class="col-sm-2 control-label">Mobile Phone</label>
-						<div class="col-sm-10 input-group" style="padding-left: 15px; padding-right: 15px;">
+						<label for="inputTitle" class="col-sm-3 control-label">Mobile Phone</label>
+						<div class="col-sm-9 input-group" style="padding-left: 15px; padding-right: 15px;">
 						  	<input type="text" class="form-control" name="MobilePhone">
 							<span class="input-group-addon">
 								<input type="radio" name="PreferredPhone" value="Mobile"/>		
@@ -188,8 +189,8 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputTitle" class="col-sm-2 control-label">Home Phone</label>
-						<div class="col-sm-10 input-group" style="padding-left: 15px; padding-right: 15px;">
+						<label for="inputTitle" class="col-sm-3 control-label">Home Phone</label>
+						<div class="col-sm-9 input-group" style="padding-left: 15px; padding-right: 15px;">
 						  	<input type="text" class="form-control" name="HomePhone">
 							<span class="input-group-addon">
 								<input type="radio" name="PreferredPhone" value="Home"/>		
@@ -197,8 +198,8 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputTitle" class="col-sm-2 control-label">Work Phone</label>
-						<div class="col-sm-10 input-group" style="padding-left: 15px; padding-right: 15px;">
+						<label for="inputTitle" class="col-sm-3 control-label">Work Phone</label>
+						<div class="col-sm-9 input-group" style="padding-left: 15px; padding-right: 15px;">
 						  	<input type="text" class="form-control" name="WorkPhone">
 							<span class="input-group-addon">
 								<input type="radio" name="PreferredPhone" value="Work"/>		
@@ -206,8 +207,8 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputTitle" class="col-sm-2 control-label">Fax Number</label>
-						<div class="col-sm-10 input-group" style="padding-left: 15px; padding-right: 15px;">
+						<label for="inputTitle" class="col-sm-3 control-label">Fax Number</label>
+						<div class="col-sm-9 input-group" style="padding-left: 15px; padding-right: 15px;">
 						  	<input type="text" class="form-control" name="FaxPhone">
 							<span class="input-group-addon">
 								<input type="radio" name="PreferredPhone" value="Fax"/>		
@@ -215,8 +216,8 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputTitle" class="col-sm-2 control-label">Other Phone</label>
-						<div class="col-sm-10 input-group" style="padding-left: 15px; padding-right: 15px;">
+						<label for="inputTitle" class="col-sm-3 control-label">Other Phone</label>
+						<div class="col-sm-9 input-group" style="padding-left: 15px; padding-right: 15px;">
 						  	<input type="text" class="form-control" name="VoicePhone">
 							<span class="input-group-addon">
 								<input type="radio" name="PreferredPhone" value="Other"/>		
@@ -234,27 +235,27 @@
 				<div id="confirm" style="display: none;">
 					<h3> Confirm your details</h3>
 					<div class="form-group">
-						<label for="inputName" class="col-sm-2 control-label">Name</label>
-						<div class="col-sm-10">
-						  <span id="_name"></span>
+						<label for="inputName" class="col-sm-3 control-label">Name</label>
+						<div class="col-sm-9">
+						  <label id="_name" class="control-label"></label>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputEmailAddress" class="col-sm-2 control-label">Email Address</label>
-						<div class="col-sm-10">
-						  <span id="_email"></span>
+						<label for="inputEmailAddress" class="col-sm-3 control-label">Email Address</label>
+						<div class="col-sm-9">
+						  <label id="_email" class="control-label"></label>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputDOB" class="col-sm-2 control-label">Date of Birth</label>
-						<div class="col-sm-10">
-						  <span id="_dob"></span>
+						<label for="inputDOB" class="col-sm-3 control-label">Date of Birth</label>
+						<div class="col-sm-9">
+						  <label id="_dob" class="control-label"></label>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputAddress" class="col-sm-2 control-label">Address</label>
-						<div class="col-sm-10">
-						  <span id="_address"></span>
+						<label for="inputAddress" class="col-sm-3 control-label">Address</label>
+						<div class="col-sm-9">
+						  <label id="_address" class="control-label"></label>
 						</div>
 					</div>
 					<input class="btn btn-default" type="button" id="back2" value="Back">
@@ -270,7 +271,7 @@
 					<div class="alert alert-success" id="register-success" role="alert">
 					  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
 					  <span class="message">
-						<h4>Thank you, your registration to the panel was successful. An email will be sent to the registered email address with your login details.</h4>
+						Thank you, your registration to the panel was successful. An email will be sent to the registered email address with your login details.
 					  </span>
 					</div>
 					<div id="postregoinfo" style="display: none;">
