@@ -88,12 +88,80 @@ CP.Form = CP.extend(CP.emptyFn, {
 		self.checkVisibility = function (index) {
 			self.showthispage = index > 0 ? false : true;
 		};
+		
+		self.toggleOtherBox = function(code){
+			//alert(code);
+			var aInputs = $('input[name="' + code +'"]');
+			var oOtherBox = $.grep(aInputs, function(input){
+				return input.id == "other";
+			});
+			
+			if (oOtherBox.length){
+				var selectedValue = $('input:radio[name="'+ code +'"]:checked').val();
+				if (selectedValue != '999'){
+					$(oOtherBox).attr('disabled', true);
+				}
+				
+				$(aInputs).on('change', function(){
+					var selectedValue = $('input:radio[name="'+ code +'"]:checked').val();
+					if (selectedValue == '999'){
+						$(oOtherBox).attr('disabled', false);
+					}
+					else {
+						$(oOtherBox).attr('disabled', true);
+					}
+					
+				});	
+			}
+			
+		};
+		
+		self.setExclusiveChoice = function(code){
+			var aInputs = $('input[name="' + code +'"]');
+			var oExclusiveChoice = $.grep(aInputs, function(input){
+				return input.value == "-1";
+			});
+			
+			if (oExclusiveChoice.length){
+				var bSelected = $(oExclusiveChoice).is(':checked');
+				if (bSelected){
+					$(aInputs).each(function(i,v){
+						var sValue = $(v).val();
+						if (sValue != "-1"){
+							$(v).attr('checked', false);
+							$(v).attr('disabled', true);
+						}
+					});
+				}
+				
+				$(oExclusiveChoice).on('change', function(){
+					var bSelected = $(this).is(':checked');
+					if (bSelected){
+						$(aInputs).each(function(i,v){
+							var sValue = $(v).val();
+							if (sValue != "-1"){
+								$(v).attr('checked', false);
+								$(v).attr('disabled', true);
+							}
+						});
+					}
+					else {
+						$(aInputs).each(function(i,v){
+							var sValue = $(v).val();
+							if (sValue != "-1"){
+								$(v).attr('disabled', false);
+							}
+						});
+					}
+				});
+			}
+		};
 
 		self.loadFormData(data);
 		$('#dvForm').attr('formid', CP.getURLParam('formid'));
 
 	},
-
+	
 	setHiddenRules: function (items) {
 		$.each(items, function (i, v) {
 			var attributeToHide = v.attributeid;

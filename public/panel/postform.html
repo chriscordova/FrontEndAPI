@@ -36,6 +36,12 @@
 								</tbody>
 							</table>
 							<!--ko with: $root.setAttributeValues($root.actualattributedata, $root.datatype)--><!--/ko-->
+							<!--ko if: $root.questiontype == "QuestionType_SingleChoiceQuestion" -->
+								<!--ko with: $root.toggleOtherBox($root.attributeshortcode) --><!--/ko-->
+							<!--/ko-->
+							<!--ko if: $root.questiontype == "QuestionType_MultipleChoiceQuestion" -->
+								<!--ko with: $root.setExclusiveChoice($root.attributeshortcode) --><!--/ko-->
+							<!--/ko-->
 							<!--ko with: $root.getHiddenRules(hiddenattributes)--><!--/ko-->
 							<!--/ko-->
 							<!--ko if: $index() !== 0 -->
@@ -67,11 +73,16 @@
 		<script type="text/html" id="QuestionType_SingleChoiceQuestion">
 			<h4 data-bind="text: $root.attributetitle"></h4>
 				<!--ko foreach: $root.attributelistitems -->
-				<label><input type="radio" data-bind = "value: value, attr: { name: $root.attributeshortcode }"/>&nbsp; <!--ko text: name--> <!--/ko--></label>
-				<!--ko if: value === 999-->
-				&nbsp;&nbsp;&nbsp;<input type='text' data-bind="attr: { name: $root.attributeshortcode }" id='other'/>
-				<!--/ko-->
-				<br />
+					<!--ko if: value === 999-->
+						<div class="form-inline">
+						<label><input type="radio" data-bind = "value: value, attr: { name: $root.attributeshortcode }"/>&nbsp; <!--ko text: name--> <!--/ko--></label>
+							&nbsp;&nbsp;&nbsp;<input type='text' class="form-control" data-bind="attr: { name: $root.attributeshortcode }" id='other'/>
+						</div>
+					<!--/ko-->
+					<!--ko ifnot: value === 999-->
+						<label><input type="radio" data-bind = "value: value, attr: { name: $root.attributeshortcode }"/>&nbsp; <!--ko text: name--> <!--/ko--></label>
+					<!--/ko-->
+					<br />
 				<!--/ko-->
 		</script>
 		<script type="text/html" id="QuestionType_DropDownQuestion">
@@ -95,12 +106,16 @@
 		</script>
 		<script type="text/html" id="QuestionType_NumericQuestion">
 			<h4 data-bind="text: $root.attributetitle"></h4>
-				<!--ko if: $root.usecurrency-->$<!--/ko-->
+				<div class="input-group">
+				<!--ko if: $root.usecurrency-->
+				<span class="input-group-addon">$</span>
+				<!--/ko-->
 				<input type="number" class="form-control" data-bind = "attr: { name: $root.attributeshortcode }"/>
+				</div>
 		</script>
 		<script type="text/html" id="QuestionType_DateQuestion">
 			<h4 data-bind="text: $root.attributetitle"></h4>
-				<input type="date" data-bind = "attr: { name: $root.attributeshortcode }"/>
+				<input type="date" class="form-control" data-bind = "attr: { name: $root.attributeshortcode }"/>
 		</script>
 		<!-- script references -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
