@@ -74,6 +74,24 @@ var CP = {
     },
 
 	emptyGuid: '00000000-0000-0000-0000-000000000000',
+	
+	toggleSidebar: function(){
+		var span = $('#toggleSidebar');
+		var leftCol = $('#leftCol');
+		span.on('click', function(){
+			var bVisible = leftCol.is(':visible');
+			if (bVisible){
+				leftCol.addClass('hidden-xs');
+				leftCol.addClass('hidden-sm');
+				span.html("Show Sidebar");
+			}
+			else{
+				leftCol.removeClass('hidden-xs');
+				leftCol.removeClass('hidden-sm');
+				span.html("Hide Sidebar");
+			}
+		});
+	},
 
     isGuid: function (guid) {
         return (guid == "00000000-0000-0000-0000-000000000000" || guid == "" || guid == null) ? false : true;
@@ -699,3 +717,5 @@ CP.Message = {
     }
 
 };
+
+CP.toggleSidebar();
