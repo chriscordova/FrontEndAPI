@@ -284,8 +284,8 @@ var CP = {
 		$(oSelectorMessage).html(message);
 		
 		//Scroll to message
-		var scrollPos = $(oSelectorMessage).offset().top;
-		$(window).scrollTop(scrollPos);
+		/*var scrollPos = $(oSelectorMessage).offset().top;
+		$(window).scrollTop(scrollPos);*/
 	},
 	
 	formValidation: function(attributeid, noError){

@@ -13,6 +13,8 @@
 		</div>
 		<button class="btn btn-lg btn-primary btn-block" id="btnLogin" type="submit">Sign in</button>
 	</form>
+	<br />
+	<div style="width: 100%; text-align: center; display: none;" id="loading"><img src="../Resources/loading.gif"/></div>
 	<div class="alert alert-danger" role="alert" id="login-fail" style="display: none;">
 	  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
 	  <span class="sr-only">Error:</span>
@@ -59,7 +61,10 @@ $(document).ready(function(){
 	});
 
 	$('#btnLogin').on('click', function () {
-
+		
+		$('#login-fail').hide();
+		$('#loading').show();
+		
 		var oData = {
 			action: "PanelLogin",
 			emailaddress: $('#inputEmail').val(),
@@ -83,6 +88,7 @@ $(document).ready(function(){
 				
 				var sError = CP.Message.getError(obj);					
 				CP.setValidationBox('login', false, sError);
+				$('#loading').hide();
 				return false;
 			}
 		});

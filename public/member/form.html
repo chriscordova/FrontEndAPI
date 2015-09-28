@@ -47,7 +47,7 @@
 							<!--ko with: $root.getHiddenRules(hiddenattributes)--><!--/ko-->
 							<!--/ko-->
 							<!--ko if: $index() !== 0 -->
-							<input type='button' class='btn btn-default' id='back' value='Back' />&nbsp;
+							<input type='button' class='btn btn-primary' id='back' value='Back' />&nbsp;
 							<!--/ko-->
 							<!--ko template: $index() === ($parent.formdata.length - 1) ? 'LastFormPage' : 'InnerFormPage'--><!--/ko-->
 						</div>
@@ -67,11 +67,11 @@
 		</div>
 		<footer class="footer" style="  background: #2c3e50; height: 60px; margin-top: 60px;"></footer>
 		<script type="text/html" id="LastFormPage">
-			<input type='button' class='btn btn-default' id='save-attribute' value='Save and Finish' />
+			<input type='button' class='btn btn-success' id='save-attribute' value='Save and Finish' />
 		</script>
 		<script type="text/html" id="InnerFormPage">
-			<input type='button' class='btn btn-default' id='save-attribute' value='Save and Next' />&nbsp;
-			<input type='button' class='btn btn-default saveclose' id='save-attribute' value='Save and Close' />
+			<input type='button' class='btn btn-success' id='save-attribute' value='Save and Next' />&nbsp;
+			<input type='button' class='btn btn-warning saveclose' id='save-attribute' value='Save and Close' />
 		</script>
 		<script type="text/html" id="QuestionType_SingleChoiceQuestion">
 			<h4 data-bind="text: $root.attributetitle"></h4>

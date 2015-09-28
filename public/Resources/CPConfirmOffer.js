@@ -67,28 +67,73 @@ CP.ConfirmOffer = CP.extend(CP.emptyFn, {
 		$('.prev a').attr('href', 'offers.html?offerid=' + sOfferGroupId);
 
 		$.each(data.Data.offergroupswithlist, function (index, value) {
-
-			$.each(this.offerlist, function (i, v) {
-				var nTitle = v.title;
-				var nDescription = v.pagedescription;
-				var nElectronic = v.iselectronic;
-				var nLogo = v.logoURL;
-				var nCost = v.cost;
-				var nCredits = v.credits;
-				var nIdentity = v.listid;
-
-				if (nIdentity == offerid) {
-					sTable += '<table id="offer" class="table table-striped">';
-					sTable += '<tr><td><b>Title:</b></td><td>' + nTitle + '</td></tr>';
-					sTable += '<tr><td><b>Description:</b></td><td>' + nDescription + '</td></tr>';
-					sTable += '<tr><td><b>Electronic:</b></td><td>' + nElectronic + '</td></tr>';
-					sTable += '<tr><td><b>Logo:</b></td><td>' + nLogo + '</td></tr>';
-					sTable += '<tr><td><b>Cost:</b></td><td>' + nCost + '</td></tr>';
-					sTable += '<tr><td><b>Credits:</b></td><td>' + nCredits + '</td></tr>';
-					sTable += '<tr><td><input type="button" class="btn btn-default" id="purchase" value="Purchase Offer" /></td></tr>';
-					sTable += '</table>';
-				}
+			
+			var oOffer = $.grep(this.offerlist, function(s){
+				return s.listid == offerid;
 			});
+			
+			var o = oOffer[0];
+			if (o){
+				var nTitle = o.title;
+				var nDescription = o.pagedescription;
+				var nElectronic = o.iselectronic;
+				var nLogo = o.logoURL;
+				var nCost = o.cost;
+				var nCredits = o.credits;
+				var nIdentity = o.listid;
+				
+				sTable += '<table id="offer" class="table table-striped visible-xs">';
+				sTable += '<tr>';
+				sTable += '<td colspan="2">';
+				sTable += '<img src="'+CP.apiOrigin()+nLogo+'" class="img-responsive" style="height: 110px;"/>';
+				sTable += '</td>';
+				sTable += '<tr>';
+				sTable += '<td><b>Title</b></td>';
+				sTable += '<td>'+nTitle+'</td>';
+				sTable += '</tr>';
+				sTable += '<tr>';
+				sTable += '<td><b>Description</b></td>';
+				sTable += '<td>'+nDescription+'</td>';
+				sTable += '</tr>';
+				sTable += '<tr>';
+				sTable += '<td><b>Cost</b></td>';
+				sTable += '<td>'+nCredits+'</td>';
+				sTable += '</tr>';
+				sTable += '<tr>';
+				sTable += '<td style="vertical-align: middle;" colspan="2">';
+				sTable += '<input type="button" class="btn btn-success" id="purchase" value="Purchase Offer" />';
+				sTable += '</td>';
+				sTable += '</tr>';
+				sTable += '</table>';
+				
+				sTable += '<table id="offer" class="table table-striped hidden-xs">';
+				sTable += '<tr>';
+				sTable += '<td>';
+				sTable += '<img src="'+CP.apiOrigin()+nLogo+'" class="img-responsive" style="height: 110px;"/>';
+				sTable += '</td>';
+				sTable += '<td>';
+				sTable += '<table class="table table-striped">';
+				sTable += '<tr>';
+				sTable += '<td><b>Title</b></td>';
+				sTable += '<td>'+nTitle+'</td>';
+				sTable += '</tr>';
+				sTable += '<tr>';
+				sTable += '<td><b>Description</b></td>';
+				sTable += '<td>'+nDescription+'</td>';
+				sTable += '</tr>';
+				sTable += '<tr>';
+				sTable += '<td><b>Cost</b></td>';
+				sTable += '<td>'+nCredits+'</td>';
+				sTable += '</tr>';
+				sTable += '</table>';
+				sTable += '</td>';
+				sTable += '<td style="vertical-align: middle;">';
+				sTable += '<input type="button" class="btn btn-success" id="purchase" value="Purchase Offer" />';
+				sTable += '</td>';
+				sTable += '</tr>';
+				sTable += '</table>';
+			}
+			
 		});
 
 		return sTable;
