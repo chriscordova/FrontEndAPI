@@ -72,6 +72,9 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 			if (CP.isNotNullOrEmpty(oAttributeData)) {
 				self.actualattributedata = oAttributeData;
 			}
+			else {
+				self.actualattributedata = null;
+			}
 		};
 
 		self.getHiddenRules = function (e) {
@@ -79,7 +82,8 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 		};
 
 		self.setAttributeValues = function (a, b) {
-			pageObj.setAttributeValues(a, b, self.dropdown);
+			if (CP.isNotNullOrEmpty(a))
+				pageObj.setAttributeValues(a, b, self.dropdown);
 		};
 
 		self.loadFormData = function (e) {

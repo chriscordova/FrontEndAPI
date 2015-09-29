@@ -63,10 +63,14 @@ CP.Form = CP.extend(CP.emptyFn, {
 				sInputType = CP.getControlFromDataType(sQuestionType, bDropDown);
 				self.questiontype = pageObj.getQuestionTemplate(sInputType);
 			}
-
+			
+			
 			var oAttributeData = oAttribute.attributedata[0];
 			if (CP.isNotNullOrEmpty(oAttributeData)) {
 				self.actualattributedata = oAttributeData;
+			}
+			else{
+				self.actualattributedata = null;
 			}
 		};
 
@@ -75,7 +79,8 @@ CP.Form = CP.extend(CP.emptyFn, {
 		};
 
 		self.setAttributeValues = function (a, b) {
-			pageObj.setAttributeValues(a, b, self.dropdown);
+			if (CP.isNotNullOrEmpty(a))
+				pageObj.setAttributeValues(a, b, self.dropdown);
 		};
 
 		self.loadFormData = function (e) {
