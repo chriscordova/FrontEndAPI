@@ -86,6 +86,9 @@ CP.LoggedLeft = CP.extend(CP.emptyFn, {
 				}
 			});
 		});
+		
+		//debugger;
+		pageObj.setJobAndGroupBadges();
 
 	},
 
@@ -93,7 +96,44 @@ CP.LoggedLeft = CP.extend(CP.emptyFn, {
 	count: 0,
 	attributeId: "",
 	dataType: "",
+	
+	setJobAndGroupBadges: function(){
+		//Job Activity
+		var pageObj = this;
+		var oData1 = {
+			action: "GetJobActivityandCounts",
+			token: CP.apiTOKEN()
+		};
 
+		$.post(CP.apiURL(), oData1, function (response) {
+			var obj = response;
+			if (obj.Success) {
+				var data1 = obj.Data;
+				var iCount1 = data1.jobsurveycount;
+				$('#ja').html(iCount1);
+				
+				var oData2 = {
+					action: "GetUpcomingGroupsAndCounts",
+					token: CP.apiTOKEN()
+				};
+		
+				$.post(CP.apiURL(), oData2, function (response) {
+					var obj = response;
+					if (obj.Success) {
+						var data2 = obj.Data;
+						var iCount2 = data2.recruitmentgroupcount;
+						$('#ug').html(iCount2);
+						
+						var iTotal = parseInt(iCount1, 10) + parseInt(iCount2, 10);
+						$('#jg').html(iTotal.toString());
+					}
+				});
+			}
+		});
+		
+		
+	},
+	
 	buildPoll: function (AttributeId, AwardedCredits) {
 		var pageObj = this;
 

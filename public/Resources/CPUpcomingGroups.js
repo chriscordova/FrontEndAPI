@@ -40,7 +40,7 @@ CP.UpcomingGroups = CP.extend(CP.emptyFn, {
 		var aGroupData = oData.recruitmentgroupdata;
 		var sTable = "";
 
-		sTable += "<h4>Upcoming Groups - " + iGroupCount + "</h4>";
+		//sTable += "<h4>Groups - " + iGroupCount + "</h4>";
 		$.each(aGroupData, function (i, v) {
 			var sStartDate = v.startdate;
 			var bNeedToConfirm = v.confirmattendance;

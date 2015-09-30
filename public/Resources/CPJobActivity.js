@@ -47,7 +47,7 @@ CP.JobActivity = CP.extend(CP.emptyFn, {
 			var sCreateDate = v.createdate;
 			var sSurveyLink = v.surveylink;
 			sTable += "<table class='table table-striped'>";
-			sTable += "<tr><td>Survey Link: </td><td>" + sSurveyLink + "</td></tr>";
+			sTable += "<tr><td>Survey Link: </td><td><a href='" + sSurveyLink + "' target='_blank'>"+ sSurveyLink +"</a></td></tr>";
 			sTable += "<tr><td>Survey Create Date: </td><td>" + sCreateDate + "</td></tr>";
 			sTable += "<tr><td>Completion Credits: </td><td>" + sCredits + "</td></tr>";
 			if (sEmailId == CP.emptyGuid) {

@@ -29,10 +29,10 @@
 	  </li>
 	  <li><a href="referafriend.html">Refer a Friend</a></li>
 	  <li class="dropdown">
-		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Jobs and Groups <span class="caret"></span></a>
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Jobs and Groups<span style="margin-left: 5px;" class="badge" id="jg"></span> <span class="caret"></span></a>
 		<ul class="dropdown-menu" role="menu">
-			<li><a href="jobactivity.html">Job Activity</a></li>
-			<li><a href="upcominggroups.html">Upcoming Groups</a></li>
+			<li><a href="jobactivity.html">Job Activity<span style="margin-left: 5px;" class="badge" id="ja"></span></a></li>
+			<li><a href="upcominggroups.html">Upcoming Groups<span style="margin-left: 5px;" class="badge" id="ug"></span></a></li>
 		</ul>
 	  </li>	
 	  <li><a href="emails.html">Emails</a></li>

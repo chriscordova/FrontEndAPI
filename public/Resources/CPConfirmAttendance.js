@@ -78,14 +78,14 @@ CP.ConfirmAttendance = CP.extend(CP.emptyFn, {
 
 		sTable += "<h3>Confirm Attendance</h3>";
 		$.each(aGroupData, function (i, v) {
-			var sDescription = v.locationdescription;
 			var sStartDate = v.startdate;
 			var sDuration = v.duration;
+			var sDetails = v.groupdetails;
 			sTable += "<table class='table table-striped'>";
-			sTable += "<tr><td>Group Start Date: </td><td>" + sStartDate + "</td></tr>";
+			sTable += "<tr><td width='150px'>Group Start Date: </td><td>" + sStartDate + "</td></tr>";
 			sTable += "<tr><td>Duration: </td><td>" + sDuration + "</td></tr>";
-			sTable += "<tr><td>Location Description: </td><td>" + sDescription + "</td></tr>";
-			sTable += "<tr><td>Notes:</td><td><textarea style='width: 100%;height: 100px;' id='notes'></textarea></td></tr>";
+			sTable += "<tr><td>Details: </td><td>" + sDetails + "</td></tr>";
+			sTable += "<tr><td>Comments:</td><td><textarea class='form-control' style='width: 100%;height: 100px;' id='notes'></textarea></td></tr>";
 
 			sTable += "</table>";
 		});
