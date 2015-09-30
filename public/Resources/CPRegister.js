@@ -219,7 +219,7 @@ CP.Register = CP.extend(CP.emptyFn, {
 		var pageObj = this;
 		$('#register-fail').hide();
 		$('#confirm').hide();
-		$('#loading').show();
+		$('#register-loading').show();
 
 		var sRefId;
 		sRefId = CP.getURLParam("refid");
@@ -237,7 +237,7 @@ CP.Register = CP.extend(CP.emptyFn, {
 			var bSuccess = obj.Success;
 			if (bSuccess) {
 
-				$('#loading').hide();
+				$('#register-loading').hide();
 				$('#registered').show();
 															
 				//Add localStorage of refid
@@ -247,7 +247,7 @@ CP.Register = CP.extend(CP.emptyFn, {
 				pageObj.postRegistrationAction(obj);
 			}
 			else {
-				$('#loading').hide();
+				$('#register-loading').hide();
 				$('#confirm').show();
 				var sError = CP.Message.getError(obj);
 				if (CP.isNotNullOrEmpty(sError)) {

@@ -279,7 +279,7 @@ CP.PostForm = CP.extend(CP.emptyFn, {
 		};
 
 		var req = $.post(CP.apiURL(), oData4, function (response) {
-			$('#loading').hide();
+			$('#post-loading').hide();
 			var obj = response;
 			if (obj.Success) {
 
