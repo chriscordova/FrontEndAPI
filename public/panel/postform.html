@@ -103,7 +103,12 @@
 		</script>
 		<script type="text/html" id="QuestionType_TextQuestion">
 			<h4 data-bind="text: $root.attributetitle"></h4>
-				<input type="text" class="form-control" data-bind = "attr: { name: $root.attributeshortcode }"/>
+				<!--ko if: $root.multiline-->
+					<textarea class="form-control" data-bind = "attr: { name: $root.attributeshortcode, rows: $root.textarearows, columns: $root.textareacolumns, maxlength: $root.textareamaxlength }"></textarea>
+				<!--/ko-->
+				<!--ko ifnot: $root.multiline-->
+					<input type="text" class="form-control" data-bind = "attr: { name: $root.attributeshortcode }"/>
+				<!--/ko-->
 		</script>
 		<script type="text/html" id="QuestionType_NumericQuestion">
 			<h4 data-bind="text: $root.attributetitle"></h4>

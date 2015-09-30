@@ -59,7 +59,7 @@ CP.LoggedLeft = CP.extend(CP.emptyFn, {
 		});
 
 		$('#submit-poll').on('click', function () {
-			debugger;
+			//debugger;
 			var sValues = pageObj.getSelectedValues(pageObj.attributeId, pageObj.dataType);
 
 			var oData6 = {
@@ -222,7 +222,7 @@ CP.LoggedLeft = CP.extend(CP.emptyFn, {
 		};
 
 		$.post(CP.apiURL(), oData4, function (response) {
-			debugger;
+			//debugger;
 			var obj = response;
 			if (obj.Success) {
 				if (obj.Data.polls == false) {

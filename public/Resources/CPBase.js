@@ -476,46 +476,53 @@ var CP = {
 
 	getValuesFromInputType: function (oInput) {
 		var sValues = "";
+		var bIsTextArea = $(oInput).is('textarea');
 		var oInputType = $(oInput).attr('type');
-		switch (oInputType) {
-			case "text":
-			case "number":
-				sValues = $(oInput).val();
-				break;
-			case "date":
-				var dateValue = $(oInput).val();
-				var bMatch = dateValue.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-				if (bMatch) {
-					sValues = bMatch[3] + "/" + bMatch[2] + "/" + bMatch[1];
-				}
-				break;
-			case "radio":
-				$.each(oInput, function (i, v) {
-					var bChecked = $(v).is(':checked');
-					if (bChecked) {
-						var sVal = $(v).val();
-						sValues += sVal;
-						if (sVal == '999') {
-							var otherInput = $(v).parent().next();
-							if (otherInput.length > 0) {
-								var otherValue = otherInput.val();
-								sValues += '|' + otherValue;
+		if (CP.isNotNullOrEmpty(oInputType)){
+			switch (oInputType) {
+				case "text":
+				case "number":
+					sValues = $(oInput).val();
+					break;
+				case "date":
+					var dateValue = $(oInput).val();
+					var bMatch = dateValue.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+					if (bMatch) {
+						sValues = bMatch[3] + "/" + bMatch[2] + "/" + bMatch[1];
+					}
+					break;
+				case "radio":
+					$.each(oInput, function (i, v) {
+						var bChecked = $(v).is(':checked');
+						if (bChecked) {
+							var sVal = $(v).val();
+							sValues += sVal;
+							if (sVal == '999') {
+								var otherInput = $(v).parent().next();
+								if (otherInput.length > 0) {
+									var otherValue = otherInput.val();
+									sValues += '|' + otherValue;
+								}
 							}
 						}
-					}
-				});
-				break;
-			case "checkbox":
-				$.each(oInput, function (i, v) {
-					var bChecked = $(v).is(':checked');
-					if (bChecked) {
-						sValues += $(v).val() + "|";
-					}
-				});
-				break;
-			default:
-				break;
+					});
+					break;
+				case "checkbox":
+					$.each(oInput, function (i, v) {
+						var bChecked = $(v).is(':checked');
+						if (bChecked) {
+							sValues += $(v).val() + "|";
+						}
+					});
+					break;
+				default:
+					break;
+			}
 		}
+		else if (bIsTextArea) {
+			sValues = $(oInput).val();
+		}
+		
 
 		return sValues;
 	},

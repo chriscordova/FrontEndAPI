@@ -36,14 +36,26 @@ CP.Form = CP.extend(CP.emptyFn, {
 		self.usecurrency = ko.observable();
 		self.datatype = ko.observable();
 		self.dropdown = ko.observable();
+		self.multiline = ko.observable();
+		self.textarearows = ko.observable();
+		self.textareacolumns = ko.observable();
+		self.textareamaxlength = ko.observable();
 		self.actualattributedata = ko.observableArray();
 		self.pageitems = ko.observableArray();
 
 		self.getAttributeData = function (items) {
-			var oAttribute, sTitle = '', sShortCode = '', sQuestionType = '', sInputType = '', bDropDown = false, bCurrency = false;
+			var oAttribute, sTitle = '', sShortCode = '', sQuestionType = '', sInputType = '', bDropDown = false, bCurrency = false, bMultiline = false, sRows = '', sColumns = '', sMaxLength = '';
 			oAttribute = items;
 			bDropDown = pageObj.isDropDownQuestion(oAttribute.properties);
 			bCurrency = pageObj.isCurrencyQuestion(oAttribute.properties);
+			bMultiline = pageObj.getPropertyValue(oAttribute.properties, "MultiLine") == "True";
+			
+			if (bMultiline){
+				sRows = pageObj.getPropertyValue(oAttribute.properties, "Rows");
+				sColumns = pageObj.getPropertyValue(oAttribute.properties, "Columns");
+				sMaxLength = pageObj.getPropertyValue(oAttribute.properties, "MaxLength");
+			}
+			
 			sTitle = oAttribute.questiontext;
 			sShortCode = oAttribute.shortcode;
 			sQuestionType = oAttribute.datatype;
@@ -55,6 +67,10 @@ CP.Form = CP.extend(CP.emptyFn, {
 			self.datatype = sQuestionType;
 			self.dropdown = bDropDown;
 			self.usecurrency = bCurrency;
+			self.multiline = bMultiline;
+			self.textarearows = sRows;
+			self.textareacolumns = sColumns;
+			self.textareamaxlength = sMaxLength;
 
 			if (bDropDown) {
 				self.questiontype = 'QuestionType_DropDownQuestion';
@@ -63,7 +79,6 @@ CP.Form = CP.extend(CP.emptyFn, {
 				sInputType = CP.getControlFromDataType(sQuestionType, bDropDown);
 				self.questiontype = pageObj.getQuestionTemplate(sInputType);
 			}
-			
 			
 			var oAttributeData = oAttribute.attributedata[0];
 			if (CP.isNotNullOrEmpty(oAttributeData)) {
@@ -401,10 +416,14 @@ CP.Form = CP.extend(CP.emptyFn, {
 			var bHidden = !$(v).is(':visible');
 			var oInput = $(v).find('input');
 			var oSelect = $(v).find('select');
+			var oTextarea = $(v).find('textarea');
 
 			if (!bHidden) {
-				if (oInput.length > 0) {
+				if (oInput.length > 0){
 					sValues = CP.getValuesFromInputType(oInput);
+				}
+				else if (oTextarea.length > 0){
+					sValues = CP.getValuesFromInputType(oTextarea);
 				}
 				else if (oSelect.length > 0) {
 					var oSelectType = $(oSelect).attr('multiple');
@@ -540,6 +559,20 @@ CP.Form = CP.extend(CP.emptyFn, {
 				
 			}
 		}
+	},
+	
+	getPropertyValue: function(properties, name){
+		var value = null;
+		$.each(properties, function (i, v) {
+			if (v.Name == name) {
+				if (CP.isNotNullOrEmpty(v.Value)) {
+					value = v.Value;
+					return value;
+				}
+			}
+		});
+
+		return value;
 	},
 	
 	isCurrencyQuestion: function (properties) {
@@ -682,12 +715,19 @@ CP.Form = CP.extend(CP.emptyFn, {
 				$(oInput).val(sValue);
 				break;
 			case "Text":
-				var oInput = oAttributeTable.find('input'),
-					sValue = Data.datatext;
+				var oInput = oAttributeTable.find('input');
+				var oTextarea = oAttributeTable.find('textarea');
+				var sValue = Data.datatext;
 				if (CP.isNullOrEmpty(sValue)){
 					return;
 				}
-				$(oInput).val(sValue);
+				
+				if (oInput.length){
+					$(oInput).val(sValue);
+				}
+				else if (oTextarea.length){
+					$(oTextarea).val(sValue);
+				}
 				break;
 			case "Date and Time":
 				var sNewDate = "",
