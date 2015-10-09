@@ -560,6 +560,14 @@ var CP = {
 		var bHasBlank = sText.indexOf(" ") >= 0;
 		var bValidLength = sText.length >= 6;
 		return !bHasBlank && bValidLength;
+	},
+	
+	refreshAPIToken: function(token){
+		if (CP.isNotNullOrEmpty(token)){
+			localStorage.removeItem("TOKEN");
+			localStorage.setItem("TOKEN", token);
+			location.reload(true);
+		}
 	}
 };
 

@@ -69,6 +69,7 @@ CP.ChangePassword = CP.extend(CP.emptyFn, {
 			var obj = response;
 			if (obj.Success) {
 				CP.setValidationBox('updatepassword', true, 'Password change successful.');
+				CP.refreshAPIToken(obj.Data.token);
 			}
 			else {
 				var sError = CP.Message.getError(obj);

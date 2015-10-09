@@ -22,7 +22,7 @@ CP.Redirect = CP.extend(CP.emptyFn, {
 		var sToken = CP.getURLParam("t");
 		if (CP.isNotNullOrEmpty(sToken)) {
 			localStorage.setItem("TOKEN", sToken.toString());
-			document.location.href = '../' + sPage;
+			document.location.href = '../member/' + sPage;
 		}
 
 	}
