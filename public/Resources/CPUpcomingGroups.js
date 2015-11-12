@@ -36,19 +36,26 @@ CP.UpcomingGroups = CP.extend(CP.emptyFn, {
 	},
 
 	buildTable: function (oData) {
-		var iGroupCount = oData.recruitmentgroupcount;
 		var aGroupData = oData.recruitmentgroupdata;
 		var sTable = "";
 
-		//sTable += "<h4>Groups - " + iGroupCount + "</h4>";
 		$.each(aGroupData, function (i, v) {
 			var sStartDate = v.startdate;
 			var bNeedToConfirm = v.confirmattendance;
 			var sConfirmLink = v.confirmattendancelink;
+			var sLocation = v.locationdescription;
+			var sDuration = v.duration;
+			var sDetails = v.groupdetails;
 			sTable += "<table class='table table-striped'>";
-			sTable += "<tr><td>Group Start Date: </td><td>" + sStartDate + "</td></tr>";
 			if (bNeedToConfirm) {
+				
 				sTable += "<tr><td colspan='2'><a href='" + sConfirmLink + "'>Confirm Attendance</a></td></tr>";
+			}
+			else {
+				sTable += "<tr><td width='150px'>Group Start Date: </td><td>" + sStartDate + "</td></tr>";
+				sTable += "<tr><td>Location: </td><td>" + sLocation + "</td>";
+				sTable += "<tr><td>Duration: </td><td>" + sDuration  + " minutes</td>"
+				sTable += "<tr><td>Details: </td><td>" + sDetails  + "</td>"
 			}
 
 			sTable += "</table>";

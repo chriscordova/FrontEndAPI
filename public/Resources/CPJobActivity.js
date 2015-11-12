@@ -27,7 +27,7 @@ CP.JobActivity = CP.extend(CP.emptyFn, {
 		$.post(CP.apiURL(), oData, function (response) {
 			$('#loading').hide();
 			var obj = response;
-			if (obj.Success == true) {
+			if (obj.Success) {
 				var oTable = pageObj.buildTable(obj.Data);
 				$('#dvRightPanel').append(oTable);
 			}
@@ -46,7 +46,9 @@ CP.JobActivity = CP.extend(CP.emptyFn, {
 			var sCredits = v.credits;
 			var sCreateDate = v.createdate;
 			var sSurveyLink = v.surveylink;
+			var sSurveyTitle = v.title;
 			sTable += "<table class='table table-striped'>";
+			sTable += "<tr><td>Survey Title: </td><td>" + sSurveyTitle + "<td></tr>";
 			sTable += "<tr><td>Survey Link: </td><td><a href='" + sSurveyLink + "' target='_blank'>"+ sSurveyLink +"</a></td></tr>";
 			sTable += "<tr><td>Survey Create Date: </td><td>" + sCreateDate + "</td></tr>";
 			sTable += "<tr><td>Completion Credits: </td><td>" + sCredits + "</td></tr>";
