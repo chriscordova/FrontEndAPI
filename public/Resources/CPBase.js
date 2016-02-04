@@ -456,8 +456,46 @@ var CP = {
 		return ((aOrder < bOrder) ? -1 : ((aOrder > bOrder) ? 1 : 0));
 	},
 
-	apiRequest: function () {
-
+	ajaxRequest: function (options, success, failure, validationOptions, refreshToken) {
+        if (typeof options  === "object"){
+            var vOptions = validationOptions || {};
+            
+            $.post(CP.apiURL(), options, function (resp) {
+                if (resp.Success) {
+                    if (vOptions.success){
+                        var message = "";
+                        if (CP.isNotNullOrEmpty(vOptions.successmessage)){
+                            message = vOptions.successmessage;
+                        }
+                        
+                        CP.setValidationBox(vOptions.validationbox, true, message);
+                    }
+                    
+                    if (refreshToken) CP.refreshAPIToken(resp.Data.token);
+                    if (typeof success === "function"){
+                        success(resp.Data);
+                    }
+                    
+                    return true;
+                }
+                else {
+                    if (vOptions.fail){
+                        var errormessage = "";
+                        if (CP.isNotNullOrEmpty(vOptions.failmessage)){
+                            errormessage = vOptions.failmessage
+                        }
+                        else {
+                            errormessage = CP.Message.getError(resp);
+                            CP.setValidationBox(vOptions.validationbox, false, errormessage);
+                            if (typeof failure === "function"){
+                                failure(resp.Data);
+                            }
+                            return false;
+                        }
+                    }
+                }
+            });
+        }
 	},
 
 	formatDateForCP: function (date) {
@@ -568,7 +606,29 @@ var CP = {
 			localStorage.setItem("TOKEN", token);
 			location.reload(true);
 		}
-	}
+	},
+    
+    allowRegisterLoginWithMobile: function (){
+        return true;
+    },
+    
+    mobilePhoneValidate: function(number){
+        var reg = new RegExp('^\\d+$');
+        var isNumber = reg.test(number);
+        var prefix = number.slice(0,2);
+        return prefix == '04' && number.length == 10 && isNumber;
+        
+    },
+    
+    atLeastOneNotAll: function(aObjects){
+        var iCount = 0;
+        $(aObjects).each(function(i,v){
+            var sValue = $(v).val();
+            if (CP.isNotNullOrEmpty(sValue)) iCount++;
+        });
+        
+        return (iCount >= 1) && (iCount < aObjects.length);
+    }
 };
 
 CP.Enums = {
@@ -614,6 +674,8 @@ CP.Message = {
 	emptyEmails: "No Panel Member Emails",
 
 	emptyParticipation: "No Participation History",
+    
+    atLeastOneButNotAll: "You must fill at least one field but not all fields.",
 
 	getError: function (obj) {
 
@@ -703,7 +765,50 @@ CP.Message = {
 			'TimeslotIdIsEmptyOrInvalid',
 			'TimeslotAttendanceStatusIsEmptyOrInvalid',
 			'UnableToAccessGroupConfirmationStatus',
-			'PostRegistrationProfileFormIsEmptyOrInvalid'
+			'PostRegistrationProfileFormIsEmptyOrInvalid',
+            'UnableToPostPoll',
+            'UnableToRetrievePoll',
+            'UnableToDeletePoll',
+            'UnableToUpdatePoll',
+            'UnableToPostProfileFormGroup',
+            'UnableToRetrieveProfileFormGroup',
+            'UnableToDeleteProfileFormGroup',
+            'UnableToUpdateProfileFormGroup',
+            'UnableToPostProfileForm',
+            'UnableToRetrieveProfileForm',
+            'UnableToDeleteProfileForm',
+            'UnableToUpdateProfileForm',
+            'UnableToPostAttributePage',
+            'UnableToRetrieveAttributePage',
+            'UnableToDeleteAttributePage',
+            'UnableToUpdateAttributePage',
+            'UnableToPostAttributePageItem',
+            'UnableToRetrieveAttributePageItem',
+            'UnableToDeleteAttributePageItem',
+            'UnableToUpdateAttributePageItem',
+            'UnableToPostAttributeGroup',
+            'UnableToRetrieveAttributeGroup',
+            'UnableToDeleteAttributeGroup',
+            'UnableToUpdateAttributeGroup',
+            'AttributeShortCodeCannotBeUsed',
+            'UnableToPostAttribute',
+            'UnableToDeleteAttribute',
+            'UnableToUpdateAttribute',
+            'UnableToPostAttributeRule',
+            'UnableToRetrieveAttributeRule',
+            'UnableToDeleteAttributeRule',
+            'UnableToUpdateAttributeRule',
+            'UnableToPostProfileFormData',
+            'UnableToRetrieveProfileFormData',
+            'UnableToDeleteProfileFormData',
+            'UnableToUpdateProfileFormData',
+            'PersonIdIsEmptyOrInvalid',
+            'UnableToPostEventTransaction',
+            'UnableToRetrieveJob',
+            'UnableToCreateTransactionJobIsClosed',
+            'PersonIdAndContactCodeIsEmptyOrInvalid',
+            'MobileNumberIsAlreadyInUse',
+            'UnableToSendLostPasswordSms'
 		]);
 
         var sReturn = "";

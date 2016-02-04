@@ -23,7 +23,7 @@
           <ul class="dropdown-menu" role="menu">
             <li><a href="changedetails.html">Change Details</a></li>
 			<li><a href="changepassword.html">Change Password</a></li>
-			<li><a href="changeemail.html">Change Email Address</a></li>
+			<li id="change-email-item"><a href="changeemail.html">Change Email Address</a></li>
 			<li><a href="unsubscribe.html">Unsubscribe</a></li>
           </ul>
 	  </li>
@@ -35,7 +35,7 @@
 			<li><a href="upcominggroups.html">Upcoming Groups<span style="margin-left: 5px;" class="badge" id="ug"></span></a></li>
 		</ul>
 	  </li>	
-	  <li><a href="emails.html">Emails</a></li>
+	  <li id="emails-item"><a href="emails.html">Emails</a></li>
 	  <li><a href="participation.html">Participation</a></li>
 	  <li><a href="profileform.html">Profile Form</a></li>
       </ul>

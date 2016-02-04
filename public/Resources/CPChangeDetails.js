@@ -16,7 +16,9 @@ CP.ChangeDetails = CP.extend(CP.emptyFn, {
 	setPageContent: function () {
 
 	},
-
+    
+    defaultEmail: false,
+    
 	initForm: function () {
 		var pageObj = this;
 		
@@ -30,8 +32,8 @@ CP.ChangeDetails = CP.extend(CP.emptyFn, {
 			action: "GetPanelMemberDetails",
 			token: CP.apiTOKEN()
 		};
-
-		$.post(CP.apiURL(), oData4, function (response) {
+        
+        $.post(CP.apiURL(), oData4, function (response) {
 			var obj = response;
 			if (obj.Success) {
 				pageObj.fillDetails(obj.Data.panelmemberdetails[0]);
@@ -43,9 +45,9 @@ CP.ChangeDetails = CP.extend(CP.emptyFn, {
 			return false;
 		});
 	},
-
+    
 	submit: function () {
-		
+		var pageObj = this;
 		var aFields = $('#details *[required]');
 		var bValid = CP.checkRequiredFields(aFields);
 		if (!bValid) {
@@ -55,23 +57,31 @@ CP.ChangeDetails = CP.extend(CP.emptyFn, {
 		
 		var oData = $("#details").serializeArray();
 		oData.push({ name: 'token', value: CP.apiTOKEN() });
-
-		$.post(CP.apiURL(), oData, function (response) {
-			var obj = response;
-			var bSuccess = obj.Success;
-			if (bSuccess) {
-				CP.setValidationBox('update', true, 'Details saved.');
-			}
-			else {
-				var sError = CP.Message.getError(obj);
-				CP.setValidationBox('update', false, sError);
-				return false;
-
-			}
-		});
+        if (pageObj.defaultEmail){
+            oData.push({ name: 'validatemobile', value: 'true' });
+        }
+        
+        var oVData = {
+            validationbox: "update",
+            success: true,
+            successmessage: "Details saved.",
+            fail: true,
+            failmessage: null
+        };
+        
+        CP.ajaxRequest(
+            oData,
+            null,
+            null,
+            oVData,
+            false
+        );
+        
 	},
 
-	fillDetails: function (oData) {
+	fillDetails: function (data) {
+        var pageObj = this;
+        var oData = data;
 		$('input[name="title"]').val(oData.title);
 		$('input[name="firstname"]').val(oData.firstname);
 		$('input[name="lastname"]').val(oData.lastname);
@@ -81,6 +91,11 @@ CP.ChangeDetails = CP.extend(CP.emptyFn, {
 		$('input[name="state"]').val(oData.state);
 		$('input[name="postalcode"]').val(oData.postalcode);
 		$('input[name="mobilephone"]').val(oData.mobilephone);
+        if (oData.isdefaultemail){
+            pageObj.defaultEmail = true;
+            $('input[name="mobilephone"]').attr('required', true);
+        }
+        
 		$('input[name="homephone"]').val(oData.homephone);
 		$('input[name="workphone"]').val(oData.workphone);
 		$('input[name="faxnumber"]').val(oData.faxnumber);

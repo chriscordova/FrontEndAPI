@@ -3,12 +3,16 @@
 		<h3 class="form-signin-heading">Please sign in</h3>
 		<label for="inputEmail" class="sr-only">Email address</label>
 		<input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+        <input type="number" id="inputMobile" class="form-control" placeholder="Mobile Number" style="display: none;">
 		<br />
 		<label for="inputPassword" class="sr-only">Password</label>
 		<input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
 		<div class="checkbox">
 		  <label>
 			<input type="checkbox" value="remember-me"> Remember me
+		  </label>
+          <label>
+			<input type="checkbox" id="usemobile"> I dont have an email address
 		  </label>
 		</div>
 		<button class="btn btn-lg btn-primary btn-block" id="btnLogin" type="submit">Sign in</button>
@@ -24,6 +28,23 @@
 </div>
 <script type="text/javascript">
 $(document).ready(function(){
+    
+    var chkNoEmail = $('#usemobile');
+    var inputMobile = $('#inputMobile');
+    var inputEmail = $('#inputEmail');
+    chkNoEmail.on('change', function(){
+       if ($(this).is(':checked')){
+           inputMobile.show();
+           inputEmail.hide();
+           inputEmail.val(''); 
+       }
+       else {
+           inputMobile.hide();
+           inputMobile.val('');
+           inputEmail.show(); 
+       }
+    });
+    
 	//Maintenance Mode Check
 	function CheckIfMaintenanceUpcoming(){
 		var oDataTest2 = {
@@ -65,12 +86,23 @@ $(document).ready(function(){
 		$('#login-fail').hide();
 		$('#loading').show();
 		
-		var oData = {
-			action: "PanelLogin",
-			emailaddress: $('#inputEmail').val(),
-			password: $('#inputPassword').val()
-		};
-		
+        var oData = null;
+        if (chkNoEmail.is(':checked')){
+            //using mobile
+            oData = {
+                action: "PanelLogin",
+                mobilenumber: inputMobile.val(),
+                password: $('#inputPassword').val()
+            };
+        }
+        else {
+            oData = {
+                action: "PanelLogin",
+                emailaddress: inputEmail.val(),
+                password: $('#inputPassword').val()
+            };
+        }
+        
 		$.post(CP.apiURL(), oData, function (response) {
 			var obj = response;
 			var bSuccess = obj.Success;

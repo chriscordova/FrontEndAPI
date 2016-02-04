@@ -25,7 +25,7 @@
 			<div id="zone1"></div>
 			<div id="zone2"></div>
 			<h3>Panel Registration</h3>
-			<form id="register" class="form-horizontal">
+			<form id="register" class="form-horizontal" novalidate>
 				<div id="part1">
 					<div class="form-group">
 						<label for="inputTitle" class="col-sm-3 control-label">Title</label>
@@ -191,7 +191,7 @@
 					<div class="form-group">
 						<label for="inputTitle" class="col-sm-3 control-label">Mobile Phone</label>
 						<div class="col-sm-9 input-group" style="padding-left: 15px; padding-right: 15px;">
-						  	<input type="text" class="form-control" name="MobilePhone">
+						  	<input type="text" class="form-control" name="MobilePhone" maxlength="10">
 							<span class="input-group-addon">
 								<input type="radio" name="PreferredPhone" value="Mobile"/>		
 							</span>
@@ -253,6 +253,12 @@
 						<label for="inputEmailAddress" class="col-sm-3 control-label">Email Address</label>
 						<div class="col-sm-9">
 						  <label id="_email" class="control-label"></label>
+						</div>
+					</div>
+                    <div class="form-group">
+						<label for="inputMobileNumber" class="col-sm-3 control-label">Mobile Number</label>
+						<div class="col-sm-9">
+						  <label id="_mobile" class="control-label"></label>
 						</div>
 					</div>
 					<div class="form-group">

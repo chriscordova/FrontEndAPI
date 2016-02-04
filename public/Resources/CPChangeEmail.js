@@ -24,26 +24,33 @@ CP.ChangeEmail = CP.extend(CP.emptyFn, {
 			action: "GetPanelMemberDetails",
 			token: CP.apiTOKEN()
 		};
-
-		$.post(CP.apiURL(), oData3, function (response) {
-			var obj = response;
-			if (obj.Success) {
-				var emailAddress = obj.Data.panelmemberdetails[0].emailaddress;
-				var altEmailAddress;
-				var altEmailAddresses = obj.Data.panelmemberdetails[0].altemailaddress;
-				if (altEmailAddresses.length > 0){
-					altEmailAddress = altEmailAddresses[0].altemailaddress;
-				}
-				
-				if (CP.isNotNullOrEmpty(emailAddress)){
-					$('input[name="currentemailaddress"]').val(emailAddress);	
-				}
-				
-				if (CP.isNotNullOrEmpty(altEmailAddress)){
-					$('input[name="currentaltemailaddress"]').val(altEmailAddress);	
-				}
-			}
-		});
+        
+        function success(obj){
+            var emailAddress = obj.panelmemberdetails[0].emailaddress;
+            var altEmailAddress;
+            var altEmailAddresses = obj.panelmemberdetails[0].altemailaddress;
+            if (altEmailAddresses.length > 0){
+                altEmailAddress = altEmailAddresses[0].altemailaddress;
+            }
+            
+            if (CP.isNotNullOrEmpty(emailAddress)){
+                $('input[name="currentemailaddress"]').val(emailAddress);	
+            }
+            
+            if (CP.isNotNullOrEmpty(altEmailAddress)){
+                $('input[name="currentaltemailaddress"]').val(altEmailAddress);	
+            }
+        }
+        
+        CP.ajaxRequest(
+            oData3,
+            success,
+            null,
+            null,
+            false
+        );
+        
+        
 		
 		$('#removeAltEmailAddress').on('click', function(){
 			pageObj.removeAltEmail();
@@ -93,18 +100,22 @@ CP.ChangeEmail = CP.extend(CP.emptyFn, {
 			password: sPassword,
 			emailaddress: sNewEmail
 		};
-
-		$.post(CP.apiURL(), oData4, function (response) {
-			var obj = response;
-			if (obj.Success) {
-				CP.setValidationBox('updateemail', true, 'Email address change successful.');
-			}
-			else {
-				var sError = CP.Message.getError(obj);
-				CP.setValidationBox('updateemail', false, sError);
-				return false;
-			}
-		});
+        
+        var oVData = {
+            validationbox: "updateemail",
+            success: true,
+            successmessage: "Email address change successful.",
+            fail: true,
+            failmessage: null
+        }
+        
+        CP.ajaxRequest(
+            oData4,
+            null,
+            null,
+            oVData,
+            false
+        );
 	},
 	
 	validateAltEmailChange: function(a,b){
@@ -142,23 +153,25 @@ CP.ChangeEmail = CP.extend(CP.emptyFn, {
 			password: sPassword,
 			altemailaddress: sNewAltEmail
 		};
-
-		$.post(CP.apiURL(), oData5, function (response) {
-			var obj = response;
-			if (obj.Success) {
-				CP.setValidationBox('updatealtemail', true, 'Alternate email address change successful');
-			}
-			else {
-				var sError = CP.Message.getError(obj);
-				CP.setValidationBox('updatealtemail', false, sError);
-				return false;
-			}
-		});
+        
+        var oVData = {
+            validationbox: "updatealtemail",
+            success: true,
+            successmessage: "Alternate email address change successful.",
+            fail: true,
+            failmessage: null
+        }
+        
+        CP.ajaxRequest(
+            oData5,
+            null,
+            null,
+            oVData,
+            false
+        );
 	},
 	
 	removeAltEmail: function(){
-		var pageObj = this;
-		
 		//Confirm they want to delete
 		var bConfirm = confirm("Are you sure you want to remove your alternate email address record?");
 		if (!bConfirm){
@@ -169,17 +182,26 @@ CP.ChangeEmail = CP.extend(CP.emptyFn, {
 			action: "RemoveAlternateEmailAddress",
 			token: CP.apiTOKEN()
 		};
-		
-		$.post(CP.apiURL(), oDeleteData, function(response){
-			var obj = response;
-			if (obj.Success){
-				window.location.reload(true);
-			}
-			else{
-				var sError = CP.Message.getError(obj);
-				CP.setValidationBox('removealtemailaddress', false, sError);
-			}
-		});
+        
+        var oVData = {
+            validationbox: "removealtemailaddress",
+            success: false,
+            successmessage: null,
+            fail: true,
+            failmessage: null
+        }
+        
+        function success(){
+            window.location.reload(true);
+        }
+        
+        CP.ajaxRequest(
+            oDeleteData,
+            success,
+            null,
+            oVData,
+            false
+        );
 		
 	}
 

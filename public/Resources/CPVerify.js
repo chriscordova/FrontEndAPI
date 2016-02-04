@@ -16,7 +16,24 @@ CP.Verify = CP.extend(CP.emptyFn, {
 	setPageContent: function () {
 
 	},
-
+    
+    fillOutDetails: function(data){
+        if (data.isdefaultemail){
+            if (CP.allowRegisterLoginWithMobile()){
+                if (CP.isNotNullOrEmpty(data.mobile)){
+                    $('#mobile_group').show();
+                    $('#mobile').val(data.mobile);
+                }
+            }
+        }
+        else {
+            $('#email_group').show();
+        }
+        
+        $('#email').val(data.emailaddress);
+        
+    },
+    
 	initForm: function () {
 		var pageObj = this;
 		var sVerifyId = CP.getURLParam("verifyid");
@@ -32,8 +49,8 @@ CP.Verify = CP.extend(CP.emptyFn, {
 			var obj = response;
 			var bSuccess = obj.Success;
 			if (bSuccess) {
-				sEmailAddress = obj.Data.emailaddress;
-				$('#email').val(sEmailAddress);
+                pageObj.fillOutDetails(obj.Data);
+                sEmailAddress = $('#email').val();
 			}
 			else {
 				var sError = CP.Message.getError(obj);

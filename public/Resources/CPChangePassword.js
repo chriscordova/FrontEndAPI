@@ -64,19 +64,23 @@ CP.ChangePassword = CP.extend(CP.emptyFn, {
 			password: sPassword,
 			newpassword: sNewPassword
 		};
-
-		$.post(CP.apiURL(), oData, function (response) {
-			var obj = response;
-			if (obj.Success) {
-				CP.setValidationBox('updatepassword', true, 'Password change successful.');
-				CP.refreshAPIToken(obj.Data.token);
-			}
-			else {
-				var sError = CP.Message.getError(obj);
-				CP.setValidationBox('updatepassword', false, sError);
-				return false;
-			}
-		});
+        
+        var oVData = {
+            validationbox: "updatepassword",
+            success: true,
+            successmessage: "Password change successful.",
+            fail: true,
+            failmessage: null
+        }
+        
+        CP.ajaxRequest(
+            oData,
+            null,
+            null,
+            oVData,
+            true
+        );
+        
 	}
 
 });

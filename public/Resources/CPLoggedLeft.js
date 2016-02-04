@@ -197,7 +197,14 @@ CP.LoggedLeft = CP.extend(CP.emptyFn, {
 			if (obj.Success) {
 				var panelMemberDetails = obj.Data.panelmemberdetails[0];
 				$('.pFullName').html(panelMemberDetails.fullname);
-				$('#pEmail').html(panelMemberDetails.emailaddress);
+                if (!panelMemberDetails.isdefaultemail){
+                    $('#pEmail').html(panelMemberDetails.emailaddress);
+                }
+                else {
+                    //We want to remove the 'Change Email Address' menu item as they are using Mobile to login/identifier
+                    $('li#change-email-item').hide();
+                    $('li#emails-item').hide();
+                }
 				
 				//Order of preference for Panel Member check is => 1. Agree To Terms 2. Has Incomplete Registration 3. Unverified Mobile Number
 				if (!panelMemberDetails.agreetoterms) {

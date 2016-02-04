@@ -92,7 +92,15 @@ CP.Register = CP.extend(CP.emptyFn, {
 	},
 
 	validateForm: function () {
-		var aFields = $('#register #part1 *[required]');
+        
+        var aFields = null;
+        if (CP.allowRegisterLoginWithMobile()){
+            aFields = $('#register #part1 *[required]').not(':input[name*="EmailAddress"]').not('[name*="UseHTMLEmails"]');
+        }
+        else{
+            aFields = $('#register #part1 *[required]');
+        }
+        
 		var bValid = CP.checkRequiredFields(aFields);
 		if (!bValid) {
 			CP.setValidationBox('register-part1', false, CP.Message.incompleteFields);
@@ -131,17 +139,34 @@ CP.Register = CP.extend(CP.emptyFn, {
 			$('#part2').show();
 			$('#part1').hide();
 			$('#register-part1').hide();
+            
+            if (CP.allowRegisterLoginWithMobile()){
+                var bNoEmailAddress = CP.isNullOrEmpty( $('input[name="EmailAddress"]').val() );
+                if (bNoEmailAddress){
+                    $('input[name="MobilePhone"]').attr('required', true);
+                }
+            }
+            
 		}
 	},
 
 	clickNext2: function () {
 		var pageObj = this;
+        
 		var aFields = $('#part2 *[required]');
 		var bValid = CP.checkRequiredFields(aFields);
 		if (!bValid) {
 			CP.setValidationBox('register-part2', false, CP.Message.incompleteFields);
 			return false;
 		}
+        
+        var sMobile = $('input[name="MobilePhone"]').val();
+        if (CP.isNotNullOrEmpty(sMobile)){
+            if (!CP.mobilePhoneValidate(sMobile)){
+                CP.setValidationBox('register-part2', false, "Mobile Number is not valid.");
+                return false;
+            }
+        }
 			
 		//Fill confirm details
 		pageObj.fillDetails();
@@ -156,8 +181,10 @@ CP.Register = CP.extend(CP.emptyFn, {
 		var sEmail = $('input[name="EmailAddress"]').val();
 		var sDOB = $('input[name="BirthDate"]').val();
 		var sAddress = $('input[name="Address1"]').val() + ' ' + $('input[name="Address2"]').val() + ' ' + $('input[name="City"]').val() + ' ' + $('select#State').val() + ' ' + $('input[name="PostalCode"]').val() + ' ' + $('select#Country').val();
+        var sMobile = $('input[name="MobilePhone"]').val();
 		$('#_name').html(sName);
 		$('#_email').html(sEmail);
+        $('#_mobile').html(sMobile);
 		$('#_dob').html(sDOB);
 		$('#_address').html(sAddress);
 	},
