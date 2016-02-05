@@ -145,6 +145,9 @@ CP.Register = CP.extend(CP.emptyFn, {
                 if (bNoEmailAddress){
                     $('input[name="MobilePhone"]').attr('required', true);
                 }
+                else {
+                    $('input[name="MobilePhone"]').removeAttr('required');
+                }
             }
             
 		}
