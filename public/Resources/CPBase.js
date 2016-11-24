@@ -218,7 +218,7 @@ var CP = {
     apiURL: function () {
 		var url = window.location.toString().slice(7);
 		if (url.slice(0, 9) == "localhost"){
-			return "http://localhost:58394/ContactProfiler/api.ashx"; 
+			return "http://localhost:50099/api.ashx"; 
 		}
 		else {
 			return CP.apiOrigin() + "api.ashx";
@@ -228,7 +228,7 @@ var CP = {
     apiOrigin: function () {
 		var url = window.location.toString().slice(7);
 		if (url.slice(0, 9) == "localhost"){
-			return "http://localhost:58394/ContactProfiler/"; 
+			return "http://localhost:50099/"; 
 		}
 		else {
 			return "http://www.cpdemo.com.au/";
